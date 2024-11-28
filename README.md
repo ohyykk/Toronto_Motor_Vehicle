@@ -1,10 +1,8 @@
-# Hot Spots of Inequality: Urban Heat Islands and Socioeconomic Disparities in Toronto
-
+## When Risk Hits the Road: Does Danger Drive a Return?
 ## Overview
+This repository contains the analysis for the paper **"When Risk Hits the Road: Does Danger Drive a Return?"** The research examines the spatial and temporal patterns of motor vehicle thefts and collisions involving Killed or Seriously Injured (KSI) individuals in Toronto. By analyzing geospatial and temporal data, the paper explores how risks are distributed and the environmental, behavioral, and contextual factors that contribute to these incidents.
 
-This repository contains the analysis for the paper **"Hot Spots of Inequality: Urban Heat Islands and Socioeconomic Disparities in Toronto."** The research examines the relationship between urban heat island (UHI) intensity, land use patterns, and socioeconomic factors across Toronto neighborhoods. By analyzing spatial and demographic data, the paper explores how urban heat is distributed and whether it disproportionately affects lower-income communities. 
-
-A combination of statistical modeling and geospatial analysis is used to identify key factors contributing to UHI intensity and propose equitable mitigation strategies. 
+A combination of statistical modeling and geospatial analysis is used to identify key risk factors and propose actionable strategies to improve urban safety. 
 
 ## File Structure
 
