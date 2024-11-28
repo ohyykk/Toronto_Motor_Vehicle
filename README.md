@@ -27,7 +27,7 @@ The repository is organized as follows:
 The analysis involves:
 1. **Geospatial Analysis**: Mapping UHI intensity across Toronto and overlaying socioeconomic and green space data.
 2. **Statistical Modeling**: Using regression and spatial models to explore the relationships between UHI intensity, income levels, and land use patterns.
-3. **Visualization**: Heatmaps and interactive maps are used to communicate findings.
+3. **Visualization**: Static plots are used to highlight the key findings.
 
 Software tools used include:
 - **R**: For statistical modeling, data manipulation, and visualizations (e.g., `ggplot2`).
