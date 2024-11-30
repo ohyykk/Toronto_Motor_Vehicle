@@ -1,37 +1,53 @@
 #### Preamble ####
-# Purpose: Models... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Models the relationship between traffic data variables to predict injury severity.
+# Author: [Your Name]
+# Date: [Current Date]
+# Contact: [Your Email]
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
-
+# Pre-requisites: 
+# - The `rstanarm` package must be installed.
+# - Cleaned datasets must exist in the specified locations.
+# Additional Information: Ensure that `rstanarm` is set up correctly.
 
 #### Workspace setup ####
 library(tidyverse)
 library(rstanarm)
+library(here)
 
 #### Read data ####
-analysis_data <- read_csv("data/analysis_data/analysis_data.csv")
+# Load cleaned traffic data
+traffic_data <- read_parquet(here("data", "02-analysis_data", "cleaned_traffic_data.parquet"))
 
-### Model data ####
-first_model <-
+#### Prepare data ####
+# Filter and transform traffic_data for modeling
+traffic_model_data <- traffic_data |>
+  mutate(
+    injury_severity_numeric = case_when(
+      impactype == "Fatal" ~ 3,
+      impactype == "Severe" ~ 2,
+      impactype == "Minor" ~ 1,
+      TRUE ~ 0
+    ),
+    speeding_numeric = 0  # Placeholder for speeding
+  ) |>
+  select(injury_severity_numeric, speeding_numeric, latitude, longitude, vehtype, road_class) |>
+  drop_na()
+
+#### Model data ####
+# Bayesian logistic regression for predicting injury severity
+injury_model <-
   stan_glm(
-    formula = flying_time ~ length + width,
-    data = analysis_data,
-    family = gaussian(),
+    formula = injury_severity_numeric ~ speeding_numeric + vehtype + road_class + latitude + longitude,
+    data = traffic_model_data,
+    family = gaussian(),  # Change to an appropriate family if injury severity is ordinal
     prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
     prior_intercept = normal(location = 0, scale = 2.5, autoscale = TRUE),
     prior_aux = exponential(rate = 1, autoscale = TRUE),
     seed = 853
   )
 
-
 #### Save model ####
 saveRDS(
-  first_model,
-  file = "models/first_model.rds"
+  injury_model,
+  file = here("models", "injury_model.rds")
 )
-
-

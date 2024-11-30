@@ -1,26 +1,35 @@
 #### Preamble ####
-# Purpose: Downloads and saves the data from [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: This script loads the downloaded motor vehicle datasets from Open Data Toronto
+# Author: Yingke He
+# Date: 25 Nov 2024
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
-
+# Pre-requisites: 
+# - The `readr` package must be installed
+# - The `here` package must be installed and loaded
+# Additional Information: Ensure you are working within the appropriate R project.
 
 #### Workspace setup ####
-library(opendatatoronto)
-library(tidyverse)
-# [...UPDATE THIS...]
+# Load required libraries
+library(readr)
+library(here)
 
-#### Download data ####
-# [...ADD CODE HERE TO DOWNLOAD...]
+# Load the simulated crime data
+crime_data <- read_csv(here("data", "01-raw_data", "theft-from-motor-vehicle.csv"))
 
+# Verify the crime data was successfully loaded
+if (exists("crime_data")) {
+  message("Crime data successfully loaded.")
+} else {
+  stop("Failed to load the crime data. Please check the file path.")
+}
 
+# Load the simulated traffic data
+traffic_data <- read_csv(here("data", "01-raw_data", "Motor Vehicle Collisions with KSI Data.csv"))
 
-#### Save data ####
-# [...UPDATE THIS...]
-# change the_raw_data to whatever name you assigned when you downloaded it.
-write_csv(the_raw_data, "inputs/data/raw_data.csv") 
-
-         
+# Verify the traffic data was successfully loaded
+if (exists("traffic_data")) {
+  message("Traffic data successfully loaded.")
+} else {
+  stop("Failed to load the traffic data. Please check the file path.")
+}
