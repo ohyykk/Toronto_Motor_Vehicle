@@ -10,7 +10,6 @@
 
 #### Workspace setup ####
 # Load required libraries
-
 library(tidyverse)
 library(janitor)
 library(here)
@@ -25,8 +24,6 @@ dir.create(here("data", "02-analysis_data"), recursive = TRUE, showWarnings = FA
 valid_divisions <- c("D51", "D42", "D32", "D31", "D41")  # Update with actual valid values
 valid_offenses <- c("Theft From Motor Vehicle Under", "Other Theft", "Fraud")  # Update with actual valid values
 
-
-
 #### Clean crime_data ####
 # Load raw crime data
 crime_data <- read_csv(here("data", "01-raw_data", "theft-from-motor-vehicle.csv"))
@@ -37,6 +34,7 @@ cleaned_crime_data <- crime_data |>
   mutate(
     report_date = as.Date(report_date, format = "%Y-%m-%d"),
     occ_date = as.Date(occ_date, format = "%Y-%m-%d"),
+    report_hour = as.integer(report_hour),  # Ensure `REPORT_HOUR` is numeric
     lat_wgs84 = as.numeric(lat_wgs84),
     long_wgs84 = as.numeric(long_wgs84)
   ) |>
@@ -46,11 +44,13 @@ cleaned_crime_data <- crime_data |>
       !is.na(division) & 
       !is.na(offence) & 
       !is.na(lat_wgs84) & 
-      !is.na(long_wgs84)  # Remove rows with missing critical fields
+      !is.na(long_wgs84) & 
+      !is.na(report_hour)  # Remove rows with missing critical fields, including report_hour
   ) |>
   filter(
     lat_wgs84 >= -90 & lat_wgs84 <= 90,  # Validate latitude
-    long_wgs84 >= -180 & long_wgs84 <= 180  # Validate longitude
+    long_wgs84 >= -180 & long_wgs84 <= 180,  # Validate longitude
+    report_hour >= 0 & report_hour <= 23  # Validate report_hour
   ) |>
   mutate(
     division = str_trim(division),  # Remove extra spaces
@@ -61,13 +61,14 @@ cleaned_crime_data <- crime_data |>
   filter(offence %in% valid_offenses) |>  # Ensure valid offense categories
   distinct(event_unique_id, .keep_all = TRUE) |>  # Ensure unique event IDs
   select(
-    event_unique_id, report_date, occ_date, division, location_type, 
+    event_unique_id, report_date, occ_date, report_hour, division, location_type, 
     premises_type, offence, mci_category, hood_158, long_wgs84, lat_wgs84
   ) |>  # Select relevant columns
   rename(
     event_id = event_unique_id,
     report = report_date,
     occurrence = occ_date,
+    hour = report_hour,
     location = location_type,
     offense = offence,
     latitude = lat_wgs84,
@@ -75,7 +76,8 @@ cleaned_crime_data <- crime_data |>
   )
 
 # Save cleaned crime data as Parquet
-write_csv(cleaned_crime_data, here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+write_parquet(cleaned_crime_data, here("data", "02-analysis_data", "cleaned_crime_data.parquet"))
+
 
 
 
@@ -142,7 +144,7 @@ if ("latitude" %in% names(traffic_data) & "longitude" %in% names(traffic_data)) 
 }
 
 # Save cleaned dataset as CSV
-write_csv(traffic_data, here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+write_parquet(traffic_data, here("data", "02-analysis_data", "cleaned_traffic_data.parquet"))
 
 # Print a summary of the cleaned dataset
 print(summary(traffic_data))
