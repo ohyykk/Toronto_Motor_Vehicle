@@ -1,14 +1,14 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "When Risk Hits the Road: Does Danger Drive a Return?"
+subtitle: "Motor Theft and Collisions in Toronto Are Driven by [Neighborhood Clustering] and [Environmental Conditions]"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Yingke He
+thanks: "Code and data are available at: [https://github.com/ohyykk/Toronto_Motor_Viehicle/tree/main](https://github.com/ohyykk/Toronto_Motor_Viehicle/tree/main)."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This study examines motor vehicle theft and traffic collisions in Toronto, focusing on spatial and temporal patterns, recovery outcomes, and contributing factors. [The analysis reveals that thefts are geographically clustered, with recovery rates differing by location type, while collisions are more frequent under poor visibility and adverse road conditions.] These findings underscore the need for targeted interventions, including enhanced surveillance in high-theft areas, infrastructure improvements for road safety, and optimized strategies for vehicle recovery. Such measures are critical for fostering safer and more secure urban mobility in Toronto."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -22,8 +22,7 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
-
-# Introduction
+# Introduction {#sec-intro}
 
 Overview paragraph
 
@@ -35,11 +34,6 @@ Why it matters paragraph
 
 Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
 
-
-
-
-
-
 # Data {#sec-data}
 
 ## Overview
@@ -48,30 +42,21 @@ We use the statistical programming language R [@citeR].... Our data [@shelter]..
 
 Overview text
 
-## Measurement
-	
+## Source
+
+
+## Data Measurement and Limitations
+
 Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
 
-## Outcome variables
+## Outcome Variables
 
 Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-
-
 
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
 ```
 
 Talk more about it.
@@ -79,106 +64,161 @@ Talk more about it.
 And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
 ```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
 
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
 ```
 
-Talk way more about it. 
+Talk way more about it.
 
-## Predictor variables
+## Predictor Variables
 
 Add graphs, tables and text.
 
 Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
 
+# Model {#sec-model}
+
+The main idea of this composite risk score model is to calculate an index of risk for owning and riding a motorbike. The modeling strategy has two primary objectives. The first objective is to estimate the likelihood of theft \( P(\text{Theft}) \) and collision \( P(\text{Collision}) \) under diverse environmental and situational conditions using logistic regression models. The second objective is to combine these probabilities into a unified Risk Index, providing actionable insights into the risk for owning and riding a motorbike
+
+The models were run in R [@citeR] using the `stats` package to implement logistic regression models predicting theft and collision probabilities. The theft model incorporates predictor variables such as neighborhood ID, premises type, report hour, location type, and report day, while the collision model includes neighborhood ID, road surface condition, lighting condition, and traffic control. 
+
+Both models estimate the log-odds of their respective probabilities using the predictors,  enabling reliable predictions under varying environmental and situational conditions. Model diagnostics and background details, including variable descriptions and performance metrics, are included in [Appendix @sec-model-details]. 
+
+## Model Set-up
+
+The logistic regression model for theft probability takes the form of the following equation:
+
+\begin{align*}
+\log\left(\frac{P(\text{Theft})}{1 - P(\text{Theft})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Premises Type} + \beta_3 \cdot \text{Report Hour} \\
+&\quad + \beta_4 \cdot \text{Location Type} + \beta_5 \cdot \text{Report Day} + \epsilon
+\end{align*}
+
+This model utilizes the following predictor variables:
+
+- **Neighborhood ID** (`hood_158`): Unique identifier for the neighborhood.
+- **Premises Type** (`premises_type`): Type of premises where the theft occurred like parking lot, garage
+- **Report Hour** (`REPORT_HOUR`):  Hour of the day the theft was reported.
+- **Location Type** (`location`):Location of the theft like indoors and outdoors.
+- **Report Day** (`REPORT_DOW`): Day of the Week Offence was Reported.
+
+The logistic regression model for collision probability takes the form of the following equation:
 
 
+\begin{align*}
+\log\left(\frac{P(\text{Collision})}{1 - P(\text{Collision})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Road Surface Condition} + \beta_3 \cdot \text{Light} \\
+&\quad + \beta_4 \cdot \text{Traffic Control} + \epsilon
+\end{align*}
 
 
+This model utilizes the following predictor variables:
+
+- **Neighborhood ID** (`hood_158`): Unique identifier for the neighborhood.
+- **Road Surface Condition** (`road_conditions`): Road surface condition like wet and dry.
+- **Lighting Condition** (`lighting_conditions`): Lighting conditions at the time of the collision like dark or clear.
+- **Traffic Control** (`traffic_control`):Type of traffic control present like stop signs or traffic signals
+After fitting both models, combine the probabilities into a weighted risk index: 
 
 
+\begin{align*}
+\text{Risk Index} &= w_1 \cdot P(\text{Theft}) + w_2 \cdot P(\text{Collision})
+\end{align*}
 
-# Model
+\begin{align*}
+\text{where weights } w_1 \text{and } w_2 \text{ are adjust based on the relative importance of theft and collision risks.}
+\end{align*}
 
-The goal of our modelling strategy is twofold. Firstly,...
+## Model justification
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+Logistic regression was selected for this analysis due to its simplicity and effectiveness in estimating probabilities for binary outcomes, such as theft and collision. This statistical method is well-suited for modeling the log-odds of an event's occurrence as a linear combination of predictor variables, providing a clear framework for understanding the relationships between independent variables and the dependent outcome. Its ability to estimate odds ratios allows for an intuitive interpretation of the impact of predictor variables, making it particularly effective for identifying and quantifying risks in diverse scenarios.
 
-## Model set-up
+This model's strengths include its flexibility in handling both categorical and continuous predictors, enabling the integration of a wide range of variables such as neighborhood characteristics, premises type, lighting conditions, road surface conditions, time of day, and environmental conditions. Additionally, logistic regression’s ability to include interaction terms and manage potential multicollinearity enhances its effectiveness in capturing complex relationships between predictors and the likelihood of thefts and collisions. Utilizing these features enables the model to deliver a thorough evaluation of the factors affecting theft and collision probabilities, addressing the first objectives of the modelling strategy. 
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+After estimating the probabilities of theft and collision, these probabilities are combined into a composite Risk Index using a weighted formula. This Risk Index offers a unified measure of risk, allowing for comparative evaluations of the relative safety of motorbike ownership and usage across varying contexts.
 
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
+The modeling approach is justified by logistic regression’s ability to deliver clear, interpretable, and statistically reliable risk estimates. Its statistical efficiency, with its capacity to manage complex, large datasets, makes it an ideal choice for accurately predicting theft and collision risk, while the composite Risk Index facilitates a clearer understanding of the risks associated with motorbike ownership and usage.
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+## Model Assumtions and Validations
 
+To validate the use of logistic regression models, the four main assumptions: binary nature of the outcome, linearity of the logit, indipendence of observations, and lack of multicollinearity will be assessed [@kononen2011logistic]. To validate the use of a composite Risk Index, the correlation of the index with observed outcomes will be assess using a Pearson correlation test.
 
-### Model justification
+### Logistic Regression Models
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+#### Binary Nature of the Outcome
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+A fundamental assumption of logistic regression is that the response variable is binary or dichotomous, meaning it can take on only two possible outcomes [@nick2007logistic]. This assumption is satisfied in both models. In the theft model, the response variable indicates whether a theft occurred, with a value of 1 representing the occurrence of theft and 0 representing its absence. Similarly, in the collision model, the response variable denotes whether a collision occurred, where 1 represents the occurrence of a collision and 0 indicates no collision. 
 
+The logistic regression model does not directly predict 1 or 0. Instead, it estimates the probability that the response variable equals 1, given the predictor variables. For instance, the theft model outputs the probability of theft occurring (P(Theft)), and the collision model outputs the probability of a collision occurring (P(Collision)). These probabilities range between 0 and 1, allowing for detailed predictions of the likelihood of the respective events.
 
-# Results
+#### Independence of Observations
+
+A second assumption of logistic regression is the independence of observations, meaning that all outcomes within the sample must be separate from one another [@stoltzfus2011logistic]. This implies that the data should not contain repeated measurements or outcomes that are inherently correlated.
+
+For this analysis, the data has been checked to ensure that it contains no duplicate measures, with each observation corresponding to a distinct event, such as a theft or collision.
+
+However, it is acknowledged that the data includes groupings by neighborhood, as indicated by the variable Neighborhood ID (`hood_158`). Neighborhood groupings may introduce some correlation due to shared environmental or socio-demographic factors. Despite this, the variable Neighborhood ID is included in the models as a predictor to account for such shared characteristics explicitly. Additionally, the other predictors, such as Road Surface Condition, Lighting Condition, and Traffic Control for the collision model, and Premises Type, Report Hour, Location Type, and Report Day for the theft model, represent independent situational or environmental variables tied to specific events.
+
+Given the heterogeneity across neighborhoods and the distinct nature of the predictors, any residual correlation within groupings is expected to be minimal and not comparable to the stronger dependency seen in matched data, such as multiple observations from the same household or individual. Accordingly, it is believed that the independence assumption of logistic regression is sufficiently satisfied for this analysis.
+
+#### Linear Relationship in the Log-Odds
+
+## ```{r}
+# Load necessary libraries
+library(dplyr)
+library(here)
+
+dataset <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Fit the logistic regression model for theft
+model <- glm(outcome ~ REPORT_HOUR + premises_type + location + REPORT_DOW, 
+             family = binomial, data = dataset)
+
+# Create bins for REPORT_HOUR
+dataset$hour_bin <- cut(dataset$REPORT_HOUR, breaks = 10)  # Divide into 10 bins
+
+# Calculate mean REPORT_HOUR and predicted probabilities for each bin
+bin_summary <- dataset %>%
+  group_by(hour_bin) %>%
+  summarise(mean_hour = mean(REPORT_HOUR, na.rm = TRUE),
+            mean_prob = mean(predict(model, type = "response"), na.rm = TRUE))
+
+# Plot the relationship between mean REPORT_HOUR and predicted probabilities
+plot(bin_summary$mean_hour, bin_summary$mean_prob, 
+     xlab = "Mean Report Hour (Binned)", 
+     ylab = "Mean Predicted Probability", 
+     main = "Linearity Check for REPORT_HOUR",
+     pch = 20, col = "blue")
+lines(lowess(bin_summary$mean_hour, bin_summary$mean_prob), col = "red", lwd = 2)
+
+```
+
+#### Absence of Multicollinearity
+
+### Composite Risk Index
+
+#### Pearson Correlation Test
+
+# Results {#sec-result}
 
 Our results are summarized in @tbl-modelresults.
 
 ```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
 
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
 ```
 
 ```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
 ```
 
+## First Result Point
 
+## Second Result Point
 
+## Third Result Point
 
-# Discussion
+# Discussion {#sec-discussion}
 
-## First discussion point {#sec-first-point}
+## First discussion point
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
 
 ## Second discussion point
 
@@ -194,8 +234,7 @@ Weaknesses and next steps should also be included.
 
 \appendix
 
-# Appendix {-}
-
+# Appendix {.unnumbered}
 
 # Additional data details
 
@@ -205,27 +244,10 @@ Weaknesses and next steps should also be included.
 
 In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows...
 
 ```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
 ```
 
 ## Diagnostics
@@ -235,25 +257,9 @@ posterior_vs_prior(first_model) +
 @fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
 
 ```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
 
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
 ```
-
-
 
 \newpage
 
-
 # References
-
-
