@@ -10,6 +10,7 @@
 
 #### Workspace setup ####
 # Load required libraries
+
 library(tidyverse)
 library(janitor)
 library(here)
@@ -23,6 +24,8 @@ dir.create(here("data", "02-analysis_data"), recursive = TRUE, showWarnings = FA
 # Define valid divisions and offenses for validation
 valid_divisions <- c("D51", "D42", "D32", "D31", "D41")  # Update with actual valid values
 valid_offenses <- c("Theft From Motor Vehicle Under", "Other Theft", "Fraud")  # Update with actual valid values
+
+
 
 #### Clean crime_data ####
 # Load raw crime data
@@ -72,43 +75,74 @@ cleaned_crime_data <- crime_data |>
   )
 
 # Save cleaned crime data as Parquet
-write_parquet(cleaned_crime_data, here("data", "02-analysis_data", "cleaned_crime_data.parquet"))
+write_csv(cleaned_crime_data, here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+
+
 
 #### Clean traffic_data ####
-# Load necessary libraries
-library(dplyr)
-library(readr)
-library(arrow)
-library(here)
-
 # Load raw traffic data
 traffic_data <- read_csv(here("data", "01-raw_data", "Motor Vehicle Collisions with KSI Data.csv"))
 
-# Remove the geometry column
-traffic_data <- traffic_data %>% select(-geometry)
+# Remove the geometry column if it exists
+if ("geometry" %in% colnames(traffic_data)) {
+  traffic_data <- traffic_data %>% select(-geometry)
+}
 
 # Clean column names to ensure they are consistent and usable
 traffic_data <- traffic_data %>% 
-  rename_with(~ gsub("\\.+", "_", .), everything()) %>% # Replace dots in column names with underscores
-  rename_with(~ gsub("[^a-zA-Z0-9_]", "", .), everything()) # Remove non-alphanumeric characters
+  janitor::clean_names() %>%  # Standardize column names
+  rename_with(~ gsub("\\.+", "_", .), everything()) %>%  # Replace dots with underscores
+  rename_with(~ gsub("[^a-zA-Z0-9_]", "", .), everything())  # Remove non-alphanumeric characters
 
-# Remove duplicates if any (based on all columns)
+# Remove duplicates
 traffic_data <- traffic_data %>% distinct()
 
-# Handle missing values (e.g., replace 'None' with NA for better handling)
+# Handle missing values (e.g., replace 'None' with NA)
 traffic_data <- traffic_data %>% 
-  mutate(across(where(is.character), ~ ifelse(. == "None", NA, .)))
+  mutate(across(where(is.character), ~ na_if(., "None")))
 
-# Convert appropriate columns to numeric or categorical types
-if("INVAGE" %in% names(traffic_data)) {
-  traffic_data$INVAGE <- as.numeric(traffic_data$INVAGE)
-}
-if("INJURY" %in% names(traffic_data)) {
-  traffic_data$INJURY <- as.factor(traffic_data$INJURY)
+# Convert columns to appropriate types
+traffic_data <- traffic_data %>% 
+  mutate(
+    invage = as.numeric(invage),  # Convert age to numeric
+    injury = as.factor(injury)    # Convert injury to categorical
+  )
+
+# Rename columns for consistency with cleaned crime data
+traffic_data <- traffic_data %>% 
+  rename(
+    accident_id = accnum,  # Accident ID
+    report_date = date,    # Date of the report
+    time_of_day = time,    # Time of the accident
+    street_primary = street1,  # Primary street
+    street_secondary = street2,  # Cross street
+    road_type = road_class,     # Type of road
+    accident_location = accloc, # Location of the accident
+    traffic_control = traffctl, # Traffic control at the location
+    visibility_conditions = visibility,  # Visibility during the accident
+    lighting_conditions = light,  # Lighting conditions
+    road_conditions = rdsfcond,  # Road surface conditions
+    accident_classification = acclass,  # Accident classification
+    impact_type = impactype,  # Type of impact
+    vehicle_type = vehtype,   # Vehicle type
+    maneuver = manoeuver,     # Maneuver involved
+    driver_action = drivact,  # Driver's action
+    driver_condition = drivcond,  # Driver's condition
+    neighborhood = neighbourhood_158,  # Neighborhood (modern)
+    division = division       # Division involved
+  )
+
+# Validate latitude and longitude (if present)
+if ("latitude" %in% names(traffic_data) & "longitude" %in% names(traffic_data)) {
+  traffic_data <- traffic_data %>% 
+    filter(
+      latitude >= -90 & latitude <= 90, 
+      longitude >= -180 & longitude <= 180
+    )
 }
 
-# Save the cleaned dataset (optional)
-write_parquet(traffic_data, here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+# Save cleaned dataset as CSV
+write_csv(traffic_data, here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
 
 # Print a summary of the cleaned dataset
 print(summary(traffic_data))
