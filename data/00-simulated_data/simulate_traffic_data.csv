@@ -1,0 +1,101 @@
+ACCNUM,DATE,ROAD_CLASS,VISIBILITY,LIGHT,RDSFCOND,VEHTYPE,IMPACTYPE,INJURY,LAT_WGS84,LONG_WGS84
+540378,2020-09-08,Minor Arterial,Rainy,Dark,Dry,Automobile,Rear-end,Non-Fatal Injury,-79.31571493120865,43.67021284252405
+775480,2013-11-14,Collector,Rainy,Dark,Icy,Bicycle,Intersection,Fatal,-79.36211919479538,43.7511689432431
+339292,2017-08-01,Collector,Cloudy,Dawn,Wet,Automobile,Rear-end,Non-Fatal Injury,-79.27243382383604,43.7981023109518
+754729,2023-06-23,Minor Arterial,Rainy,Daylight,Dry,Automobile,Approaching,Fatal,-79.40905255770777,43.79645602297969
+247759,2016-11-07,Collector,Rainy,Dawn,Icy,Truck,Intersection,Non-Fatal Injury,-79.27506185823586,43.62656035856344
+942271,2015-01-29,Minor Arterial,Cloudy,Dawn,Icy,Motorcycle,Intersection,Fatal,-79.4773793344153,43.64136453848332
+536852,2024-09-22,Minor Arterial,Rainy,Dark,Dry,Motorcycle,Rear-end,Fatal,-79.3254824786447,43.7963451818563
+803337,2018-11-08,Collector,Snowy,Daylight,Icy,Bicycle,Rear-end,Non-Fatal Injury,-79.28752619591542,43.76507316417992
+208297,2016-01-31,Minor Arterial,Snowy,Dawn,Icy,Automobile,Approaching,Fatal,-79.30428259894252,43.6124738000799
+166362,2020-12-23,Major Arterial,Clear,Daylight,Dry,Bicycle,Rear-end,Fatal,-79.44714822387323,43.77285793558694
+569227,2013-12-24,Major Arterial,Snowy,Dawn,Icy,Automobile,Approaching,No Injury,-79.27533789568115,43.703948486736046
+292879,2024-07-05,Major Arterial,Cloudy,Dawn,Dry,Motorcycle,Rear-end,No Injury,-79.21027622167021,43.7482113554608
+709552,2019-03-05,Collector,Cloudy,Dark,Wet,Automobile,Rear-end,No Injury,-79.32789795217104,43.635815668292345
+351740,2016-09-29,Minor Arterial,Clear,Dawn,Wet,Bicycle,Rear-end,Fatal,-79.41383601457346,43.73011664757505
+787833,2015-04-17,Minor Arterial,Rainy,Dark,Icy,Automobile,Rear-end,No Injury,-79.22586656988133,43.79948541885241
+753085,2013-10-17,Minor Arterial,Cloudy,Dawn,Dry,Motorcycle,Rear-end,No Injury,-79.25290185876656,43.61899707908742
+705128,2024-03-30,Minor Arterial,Cloudy,Dark,Wet,Truck,Approaching,Fatal,-79.31768925776706,43.62535618492402
+195692,2014-06-21,Major Arterial,Rainy,Dawn,Dry,Truck,Intersection,Fatal,-79.23947357952129,43.661882176389916
+861041,2022-02-17,Major Arterial,Cloudy,Dawn,Wet,Truck,Intersection,Non-Fatal Injury,-79.38291148880963,43.77809736113995
+478640,2013-10-04,Minor Arterial,Snowy,Dawn,Dry,Truck,Rear-end,No Injury,-79.33417704636231,43.679849499696864
+546376,2021-01-12,Major Arterial,Snowy,Daylight,Wet,Motorcycle,Intersection,Non-Fatal Injury,-79.31942980529276,43.66528609078377
+760116,2018-12-31,Major Arterial,Clear,Daylight,Icy,Automobile,Rear-end,Non-Fatal Injury,-79.27500475358684,43.66249678446911
+381966,2024-01-21,Major Arterial,Snowy,Dawn,Icy,Motorcycle,Intersection,Non-Fatal Injury,-79.24423257848248,43.7687186175026
+827030,2013-09-21,Minor Arterial,Snowy,Dark,Wet,Motorcycle,Approaching,Fatal,-79.37032627703157,43.772673170873894
+963412,2019-04-05,Collector,Cloudy,Dawn,Icy,Automobile,Intersection,Fatal,-79.3882169996621,43.629427513293926
+537542,2019-03-24,Major Arterial,Cloudy,Dawn,Dry,Motorcycle,Rear-end,Fatal,-79.43463397943415,43.603962877905
+194089,2019-11-28,Minor Arterial,Rainy,Dawn,Icy,Motorcycle,Rear-end,No Injury,-79.24767098743469,43.66519656344317
+951329,2021-10-18,Major Arterial,Cloudy,Dawn,Icy,Automobile,Rear-end,Non-Fatal Injury,-79.3976196530275,43.685084017599
+804322,2021-01-02,Major Arterial,Rainy,Dark,Wet,Bicycle,Intersection,Fatal,-79.24259321317076,43.687989516695964
+206565,2019-04-24,Major Arterial,Clear,Dark,Dry,Motorcycle,Approaching,Non-Fatal Injury,-79.21313729959074,43.625330136856064
+391275,2015-08-25,Collector,Rainy,Dark,Dry,Bicycle,Intersection,Non-Fatal Injury,-79.34018277358264,43.789846496190876
+645594,2016-01-10,Minor Arterial,Clear,Dawn,Icy,Automobile,Intersection,Non-Fatal Injury,-79.29427940910682,43.725020344695075
+186225,2015-03-21,Minor Arterial,Snowy,Dark,Wet,Motorcycle,Intersection,Fatal,-79.33031400230247,43.71251608226448
+979108,2013-04-19,Collector,Cloudy,Dawn,Wet,Motorcycle,Approaching,No Injury,-79.46003392736893,43.77362981033511
+116961,2022-10-01,Major Arterial,Rainy,Dark,Icy,Automobile,Approaching,Non-Fatal Injury,-79.22669532825239,43.73695928733796
+554520,2021-02-17,Minor Arterial,Clear,Dawn,Icy,Automobile,Intersection,Non-Fatal Injury,-79.24261883029249,43.631968745775524
+693040,2013-08-06,Minor Arterial,Clear,Dark,Wet,Automobile,Rear-end,No Injury,-79.47314804827329,43.78381023155525
+577593,2014-05-20,Collector,Snowy,Daylight,Wet,Automobile,Approaching,Fatal,-79.44354052436537,43.656460277084264
+383124,2019-05-15,Major Arterial,Snowy,Dawn,Icy,Bicycle,Intersection,Non-Fatal Injury,-79.43851451890077,43.61510747624561
+463451,2022-11-21,Major Arterial,Snowy,Dark,Wet,Bicycle,Rear-end,No Injury,-79.43598129157908,43.64615870593116
+522581,2022-07-21,Major Arterial,Snowy,Dark,Dry,Motorcycle,Rear-end,No Injury,-79.40137842271943,43.63477603937499
+505117,2023-12-05,Minor Arterial,Rainy,Daylight,Dry,Automobile,Intersection,Non-Fatal Injury,-79.29484625346959,43.645033583324405
+182806,2015-12-08,Collector,Cloudy,Dark,Icy,Automobile,Rear-end,Fatal,-79.31621278566308,43.786540689365935
+531991,2013-01-28,Minor Arterial,Cloudy,Daylight,Dry,Motorcycle,Intersection,Non-Fatal Injury,-79.26181907197461,43.72823368743993
+746965,2022-04-16,Major Arterial,Rainy,Dark,Dry,Bicycle,Rear-end,Non-Fatal Injury,-79.32187592026312,43.68621461908333
+734805,2020-09-04,Major Arterial,Rainy,Dawn,Wet,Truck,Approaching,No Injury,-79.21954082641751,43.75862072287127
+658255,2018-05-15,Collector,Clear,Dawn,Wet,Automobile,Rear-end,Fatal,-79.41185071889777,43.75011487468146
+262298,2018-10-26,Minor Arterial,Snowy,Dawn,Wet,Bicycle,Approaching,Fatal,-79.34911328111775,43.76334200757555
+976329,2017-10-16,Collector,Cloudy,Dawn,Wet,Truck,Rear-end,No Injury,-79.29573488384486,43.664910566201435
+422504,2016-02-17,Major Arterial,Snowy,Dawn,Icy,Truck,Intersection,Fatal,-79.21784219658002,43.60833349898458
+848602,2021-07-06,Minor Arterial,Clear,Dark,Wet,Bicycle,Approaching,Non-Fatal Injury,-79.40765926530585,43.62605168498121
+452897,2017-10-16,Collector,Cloudy,Daylight,Dry,Bicycle,Approaching,Fatal,-79.40896186991594,43.64417075449601
+376356,2020-09-14,Minor Arterial,Cloudy,Daylight,Wet,Motorcycle,Approaching,Non-Fatal Injury,-79.4441691240063,43.69759514983743
+538239,2016-12-16,Major Arterial,Cloudy,Dawn,Dry,Truck,Approaching,Non-Fatal Injury,-79.28035735648591,43.76542066447437
+973568,2019-11-08,Collector,Rainy,Daylight,Icy,Truck,Rear-end,No Injury,-79.40670660885516,43.71013527507893
+732739,2023-12-29,Minor Arterial,Snowy,Dark,Wet,Automobile,Approaching,No Injury,-79.23021441169548,43.748335231840606
+906670,2013-05-24,Collector,Snowy,Daylight,Dry,Motorcycle,Rear-end,Fatal,-79.3173312881263,43.7660469239112
+596492,2019-04-02,Major Arterial,Cloudy,Dawn,Dry,Truck,Approaching,Fatal,-79.3389734332217,43.64367212485522
+282774,2020-06-27,Major Arterial,Snowy,Dawn,Icy,Automobile,Approaching,Fatal,-79.3511499475222,43.71184029402211
+801843,2024-01-24,Major Arterial,Clear,Dawn,Wet,Automobile,Intersection,Non-Fatal Injury,-79.25958027360029,43.61123777171597
+398828,2023-07-26,Collector,Clear,Dark,Wet,Motorcycle,Rear-end,Non-Fatal Injury,-79.4011095128255,43.67801825595088
+842094,2019-04-19,Major Arterial,Cloudy,Dark,Dry,Motorcycle,Approaching,Non-Fatal Injury,-79.2946401294088,43.60019684312865
+281235,2014-05-20,Minor Arterial,Cloudy,Dawn,Icy,Truck,Rear-end,Fatal,-79.24282743986696,43.60646165427752
+807874,2018-01-21,Collector,Snowy,Dark,Dry,Automobile,Rear-end,Non-Fatal Injury,-79.38291857962031,43.65677713565528
+500880,2023-10-04,Collector,Cloudy,Daylight,Dry,Bicycle,Rear-end,Fatal,-79.29354819534346,43.70235248687677
+209715,2020-03-12,Major Arterial,Cloudy,Dark,Wet,Motorcycle,Rear-end,Non-Fatal Injury,-79.43524324328173,43.61530376984738
+399632,2018-09-23,Minor Arterial,Snowy,Dawn,Wet,Motorcycle,Approaching,Non-Fatal Injury,-79.49240110104438,43.782402529614046
+230209,2016-04-16,Minor Arterial,Cloudy,Dark,Wet,Automobile,Approaching,Non-Fatal Injury,-79.37042815075256,43.65933163347654
+106744,2021-01-31,Minor Arterial,Snowy,Daylight,Wet,Automobile,Approaching,Non-Fatal Injury,-79.29260389537085,43.696701183263215
+845039,2021-08-09,Collector,Cloudy,Daylight,Wet,Bicycle,Intersection,Fatal,-79.49185185413808,43.78953011538833
+628061,2016-07-28,Minor Arterial,Clear,Daylight,Wet,Bicycle,Intersection,No Injury,-79.2487690091366,43.70151469907723
+262615,2019-08-18,Collector,Clear,Daylight,Dry,Bicycle,Intersection,Non-Fatal Injury,-79.40684595946223,43.74466250347905
+470852,2018-05-16,Minor Arterial,Snowy,Daylight,Dry,Truck,Approaching,No Injury,-79.29356249913108,43.691521514253694
+948954,2020-01-10,Major Arterial,Rainy,Dawn,Wet,Truck,Intersection,No Injury,-79.45576033545657,43.66385542554781
+468502,2013-10-17,Collector,Rainy,Dawn,Dry,Truck,Intersection,No Injury,-79.47623335348908,43.66493001459166
+992104,2024-11-09,Minor Arterial,Snowy,Daylight,Dry,Motorcycle,Intersection,Non-Fatal Injury,-79.30247551586945,43.77697710837237
+758290,2016-03-05,Collector,Snowy,Daylight,Wet,Automobile,Approaching,No Injury,-79.32540531645064,43.62583825942129
+806108,2013-09-24,Major Arterial,Snowy,Dark,Icy,Motorcycle,Rear-end,Fatal,-79.28317809244618,43.701134176319464
+849927,2022-05-19,Collector,Cloudy,Dawn,Wet,Automobile,Rear-end,Non-Fatal Injury,-79.36306451386773,43.696028363285585
+149890,2016-11-17,Minor Arterial,Clear,Daylight,Wet,Motorcycle,Rear-end,No Injury,-79.31515198457055,43.66222049524076
+976016,2013-03-21,Collector,Snowy,Dawn,Dry,Bicycle,Intersection,No Injury,-79.29009118708782,43.77343186386861
+547728,2018-03-10,Collector,Snowy,Dawn,Icy,Bicycle,Intersection,Non-Fatal Injury,-79.44963792571798,43.61751165171154
+483822,2013-10-11,Collector,Cloudy,Daylight,Wet,Motorcycle,Rear-end,No Injury,-79.26854516894092,43.600312643963846
+724911,2014-06-15,Major Arterial,Cloudy,Dawn,Wet,Automobile,Rear-end,Fatal,-79.49827181054279,43.70005892389454
+136756,2013-09-07,Collector,Clear,Dawn,Wet,Truck,Approaching,No Injury,-79.41757899660152,43.671665218472484
+130989,2013-02-02,Major Arterial,Clear,Dark,Dry,Automobile,Intersection,No Injury,-79.44941173663828,43.75707251257263
+792513,2021-06-15,Major Arterial,Rainy,Dawn,Dry,Truck,Rear-end,Fatal,-79.24849402941764,43.75471394159831
+126256,2016-04-14,Collector,Cloudy,Dark,Dry,Truck,Rear-end,Fatal,-79.43179744393565,43.67013693996705
+677599,2018-06-16,Minor Arterial,Snowy,Daylight,Dry,Bicycle,Rear-end,Non-Fatal Injury,-79.34726131008938,43.74880232750438
+337063,2023-11-24,Minor Arterial,Cloudy,Dawn,Dry,Truck,Rear-end,No Injury,-79.30559169952758,43.77289427737705
+694411,2020-08-04,Collector,Snowy,Dawn,Dry,Bicycle,Rear-end,No Injury,-79.48120375571307,43.63330841325224
+310740,2020-08-31,Collector,Rainy,Dark,Icy,Motorcycle,Approaching,Non-Fatal Injury,-79.45720230527222,43.668554649874565
+515741,2022-11-13,Minor Arterial,Clear,Daylight,Wet,Motorcycle,Intersection,Non-Fatal Injury,-79.42240801909938,43.682222477905455
+406467,2020-07-02,Minor Arterial,Clear,Dawn,Dry,Bicycle,Rear-end,Non-Fatal Injury,-79.41833762519528,43.71810606908984
+883154,2023-07-29,Minor Arterial,Snowy,Dark,Dry,Automobile,Rear-end,Fatal,-79.23854594472796,43.79015030502342
+625294,2022-12-27,Collector,Clear,Dark,Icy,Bicycle,Approaching,Fatal,-79.42401206495705,43.76575932051055
+541367,2023-01-17,Major Arterial,Cloudy,Daylight,Dry,Bicycle,Rear-end,No Injury,-79.46403779871761,43.64380599046126
+734782,2014-04-26,Collector,Cloudy,Dark,Dry,Bicycle,Rear-end,No Injury,-79.41900692218914,43.68103011823259
+508173,2019-07-11,Collector,Clear,Dawn,Dry,Automobile,Intersection,No Injury,-79.42733209754806,43.63150176680647
+771758,2023-06-18,Major Arterial,Clear,Daylight,Icy,Motorcycle,Intersection,Fatal,-79.31546450061724,43.74532303567975

@@ -1,89 +1,102 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated motor vehicle datasets 
+# (`crime_data` and `traffic_data`).
+# Author: Yingke He
+# Date: 25 Nov 2024
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-  # - The `tidyverse` package must be installed and loaded
-  # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
-
+# - The `tidyverse` and `here` packages must be installed and loaded
+# - The datasets `crime_data.csv` and `traffic_data.csv` must exist in `data/00-simulated_data`
 
 #### Workspace setup ####
 library(tidyverse)
+library(here)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+# Load the datasets
+crime_data <- read_csv(here("data", "00-simulated_data", "simulate_crime_data.csv"))
+traffic_data <- read_csv(here("data", "00-simulated_data", "simulate_traffic_data.csv"))
 
-# Test if the data was successfully loaded
-if (exists("analysis_data")) {
-  message("Test Passed: The dataset was successfully loaded.")
+# Test if the datasets were successfully loaded
+if (exists("crime_data") && exists("traffic_data")) {
+  message("Test Passed: Both datasets were successfully loaded.")
 } else {
-  stop("Test Failed: The dataset could not be loaded.")
+  stop("Test Failed: One or both datasets could not be loaded.")
 }
 
+#### Test `crime_data` ####
+message("\nTesting `crime_data` dataset...")
 
-#### Test data ####
-
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Test if the dataset has at least 100 rows
+if (nrow(crime_data) >= 100) {
+  message("Test Passed: The `crime_data` dataset has at least 100 rows.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  stop("Test Failed: The `crime_data` dataset has fewer than 100 rows.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Test if the dataset has the expected columns
+expected_columns_crime <- c("EVENT_UNIQUE_ID", "REPORT_DATE", "OCC_DATE", "DIVISION",
+                            "LOCATION_TYPE", "OFFENCE", "MCI_CATEGORY", "HOOD_158",
+                            "LONG_WGS84", "LAT_WGS84")
+if (all(expected_columns_crime %in% colnames(crime_data))) {
+  message("Test Passed: The `crime_data` dataset contains all expected columns.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  stop("Test Failed: The `crime_data` dataset is missing some expected columns.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Test if all `DIVISION` values are non-empty
+if (all(crime_data$DIVISION != "")) {
+  message("Test Passed: The `DIVISION` column in `crime_data` contains no empty values.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: The `DIVISION` column in `crime_data` contains empty values.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
-
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+# Test if there are any missing values in the dataset
+if (all(!is.na(crime_data))) {
+  message("Test Passed: The `crime_data` dataset contains no missing values.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  stop("Test Failed: The `crime_data` dataset contains missing values.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
+#### Test `traffic_data` ####
+message("\nTesting `traffic_data` dataset...")
 
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+# Test if the dataset has at least 100 rows
+if (nrow(traffic_data) >= 100) {
+  message("Test Passed: The `traffic_data` dataset has at least 100 rows.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  stop("Test Failed: The `traffic_data` dataset has fewer than 100 rows.")
 }
 
-# Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
-  message("Test Passed: The dataset contains no missing values.")
+# Test if the dataset has the expected columns
+expected_columns_traffic <- c("ACCNUM", "DATE", "ROAD_CLASS", "VISIBILITY", "LIGHT",
+                              "RDSFCOND", "VEHTYPE", "IMPACTYPE", "INJURY", "LAT_WGS84", "LONG_WGS84")
+if (all(expected_columns_traffic %in% colnames(traffic_data))) {
+  message("Test Passed: The `traffic_data` dataset contains all expected columns.")
 } else {
-  stop("Test Failed: The dataset contains missing values.")
+  stop("Test Failed: The `traffic_data` dataset is missing some expected columns.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+# Test if all `VEHTYPE` values are valid
+valid_vehicle_types <- c("Automobile", "Motorcycle", "Truck", "Bicycle")
+if (all(traffic_data$VEHTYPE %in% valid_vehicle_types)) {
+  message("Test Passed: The `VEHTYPE` column in `traffic_data` contains only valid values.")
 } else {
-  stop("Test Failed: There are empty strings in one or more columns.")
+  stop("Test Failed: The `VEHTYPE` column in `traffic_data` contains invalid values.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Test if there are any missing values in the dataset
+if (all(!is.na(traffic_data))) {
+  message("Test Passed: The `traffic_data` dataset contains no missing values.")
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  stop("Test Failed: The `traffic_data` dataset contains missing values.")
 }
+
+# Test if the `INJURY` column has at least two unique values
+if (n_distinct(traffic_data$INJURY) >= 2) {
+  message("Test Passed: The `INJURY` column in `traffic_data` contains at least two unique values.")
+} else {
+  stop("Test Failed: The `INJURY` column in `traffic_data` contains less than two unique values.")
+}
+
+message("\nAll tests completed.")
