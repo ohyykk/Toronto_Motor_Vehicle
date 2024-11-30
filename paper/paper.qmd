@@ -24,42 +24,52 @@ library(palmerpenguins)
 
 # Introduction {#sec-intro}
 
-Overview paragraph
+Decisions surrounding motorbike ownership and usage carry significant implications for personal safety and financial liability. Recent statistics highlight the increased risks associated with owning and riding motorbikes, including a heightened likelihood of theft and collisions compared to other vehicles [@Yasmin2016]. These risks are influenced by various factors such as geographic location, road conditions, time of day, and type of motorbike, making it essential to develop tools that effectively assess and mitigate these dangers.[can add one more sentence + citations] 
 
-Estimand paragraph
+This study introduces a composite risk score model to assess the risks associated with owning and riding a motorbike. Using data from Open Data Toronto, the model evaluates two critical events: motorbike theft and collisions. Logistic regression is employed to estimate the probabilities of these events, which are then combined into a single, interpretable composite risk score. This metric, incorporating factors such as neighborhood characteristics, road and lighting conditions, and time of day, is designed to guide motorbike users, insurers, and policymakers in risk assessment and decision-making, while informing strategies to mitigate these risks.
 
-Results paragraph
+The primary estimand of the analysis is the composite risk score, derived from the individual probabilities of motorbike theft and collision. This score is calculated using predictor variables such as neighborhood characteristics, road and lighting conditions, time of day, and other contextual factors, which were selected for their documented relevance to motorbike-related risks. 
 
-Why it matters paragraph
+This analysis confirms and extends three key findings: (1) material properties significantly influence motor efficiency, with high-conductivity materials yielding higher energy savings; (2) geometric optimization of motor components enhances torque generation and reduces energy losses; and (3) operational conditions, such as load and temperature, exhibit nonlinear effects, underscoring the need for adaptive motor control strategies. Furthermore, our projections suggest that integrating advanced materials and control systems could improve motor efficiency by up to 15% by 2050, aligning with global energy transition goals [To be updated..].
 
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
+The structure of the paper is organized as follows: following @sec-intro, @sec-data outlines the data collection and preprocessing procedures, along with a detailed description of the outcome variable and the predictor variables used in the analysis. @sec-model introduces the logistic regression models applied to estimate the probabilities of theft and collision, as well as the method used to combine these probabilities into a composite risk score. @sec-result then presents the main findings, including insights into how different factors contribute to the risks of owning and riding a motorbike. Finally, @sec-discussion interprets the results, highlighting significant trends and implications for motorbike risk assessment, and concludes with a discussion on the limitations of the analysis and future research directions.
 
 # Data {#sec-data}
 
-## Overview
-
 We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
 
-Overview text
+[Libraries To be updated...]
+
+Details about the data cleaning process and the criteria for variable selection are provided in Appendix A.
 
 ## Source
 
+This study utilized two datasets published by the Toronto Police Service. The first dataset focuses on motor vehicle collisions involving killed or seriously injured persons (KSI), while the second examines thefts from motor vehicles. 
+
+The Motor Vehicle Collisions dataset includes all reported incidents in which a person was either killed or seriously injured since 2006. It offers detailed information about each collision, such as the type of incident, the severity of injuries, and the location of the event, when available. Additionally, the dataset includes fields for both the old 140 and new 158 neighborhood structures in Toronto, allowing for flexible neighborhood-level analysis across different definitions.
+
+The Theft from Motor Vehicle dataset contains all reported occurrences of thefts from vehicles, categorized by reported date. These offences are classified based on the value of the stolen items, distinguishing between theft under and theft over thresholds. Each occurrence number may include multiple rows, representing the various offences associated with a single event. The dataset excludes "unfounded" occurrences, adhering to Statistics Canada’s definition that these events were determined not to have occurred or been attempted. Like the KSI dataset, this dataset includes fields for both the old and new neighborhood structures, enabling comprehensive geographic analyses of theft trends.
+
+[Add variable types and trends]
 
 ## Data Measurement and Limitations
 
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
+The process of translating real-world phenomena into entries in the dataset involves several stages. When a traffic collision or theft occurs, it is reported to law enforcement through various channels, such as emergency calls, online submissions, or in-person reports. Police officers or administrative personnel document the event details, including date, location, type of incident, and additional attributes such as severity or value of stolen items. These records are then digitized and aggregated into structured datasets, with fields organized to support analysis and reporting. However, during this process, certain changes or context-specific information may be lost, and the data ultimately reflects a structured summary of the events rather than their full complexity.
+
+The datasets from Open Data Toronto did not specify the exact methods used for data collection, which may introduce some uncertainty regarding the consistency and reliability of the recorded events. Additionally, for privacy reasons, the locations of crime occurrences have been deliberately offset to the nearest road intersection node. This may result in discrepancies when analyzing counts by division or neighborhood, as the reported locations may not reflect the exact sites of the occurrences.
+
+Some coordinate information in the datasets appears as “0, 0,” indicating that the specific location was either not validated or could not be geocoded. In such cases, a general division or neighborhood association may still be provided, but for invalid or external locations, the designation “NSA” (“Not Specified Area”) is used. Furthermore, the Toronto Police Service does not guarantee the accuracy, completeness, or timeliness of the data, which may lead to potential misinterpretations or incomplete analyses.
+
+Additional details about the dataset are available in the datasheet, accessible through the repository linked to this paper.
 
 ## Outcome Variables
 
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.
 
 ```{r}
 
 ```
 
-Talk more about it.
 
 And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
@@ -67,13 +77,23 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 
 ```
 
-Talk way more about it.
 
 ## Predictor Variables
 
-Add graphs, tables and text.
+### Collision Probability
 
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
+#### Neighborhood ID
+#### Premises Type
+#### Report Hour 
+#### Location Type
+#### Report Day
+
+### Theft Probability
+
+#### Neighborhood ID
+#### Road Surface Condition
+#### Lighting Condition
+#### Traffic Control
 
 # Model {#sec-model}
 
@@ -148,53 +168,28 @@ A fundamental assumption of logistic regression is that the response variable is
 
 The logistic regression model does not directly predict 1 or 0. Instead, it estimates the probability that the response variable equals 1, given the predictor variables. For instance, the theft model outputs the probability of theft occurring (P(Theft)), and the collision model outputs the probability of a collision occurring (P(Collision)). These probabilities range between 0 and 1, allowing for detailed predictions of the likelihood of the respective events.
 
-#### Independence of Observations
-
-A second assumption of logistic regression is the independence of observations, meaning that all outcomes within the sample must be separate from one another [@stoltzfus2011logistic]. This implies that the data should not contain repeated measurements or outcomes that are inherently correlated.
-
-For this analysis, the data has been checked to ensure that it contains no duplicate measures, with each observation corresponding to a distinct event, such as a theft or collision.
-
-However, it is acknowledged that the data includes groupings by neighborhood, as indicated by the variable Neighborhood ID (`hood_158`). Neighborhood groupings may introduce some correlation due to shared environmental or socio-demographic factors. Despite this, the variable Neighborhood ID is included in the models as a predictor to account for such shared characteristics explicitly. Additionally, the other predictors, such as Road Surface Condition, Lighting Condition, and Traffic Control for the collision model, and Premises Type, Report Hour, Location Type, and Report Day for the theft model, represent independent situational or environmental variables tied to specific events.
-
-Given the heterogeneity across neighborhoods and the distinct nature of the predictors, any residual correlation within groupings is expected to be minimal and not comparable to the stronger dependency seen in matched data, such as multiple observations from the same household or individual. Accordingly, it is believed that the independence assumption of logistic regression is sufficiently satisfied for this analysis.
-
 #### Linear Relationship in the Log-Odds
 
-## ```{r}
-# Load necessary libraries
-library(dplyr)
-library(here)
+[Identifying Continuous Variables in Your Models:
+For LR Model 1 (Theft Model):
+Continuous Variable:
+REPORT_HOUR (Hour of the day the theft was reported
+For LR Model 2 (Collision Model):
+No Continuous Variables]
 
-dataset <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
-
-# Fit the logistic regression model for theft
-model <- glm(outcome ~ REPORT_HOUR + premises_type + location + REPORT_DOW, 
-             family = binomial, data = dataset)
-
-# Create bins for REPORT_HOUR
-dataset$hour_bin <- cut(dataset$REPORT_HOUR, breaks = 10)  # Divide into 10 bins
-
-# Calculate mean REPORT_HOUR and predicted probabilities for each bin
-bin_summary <- dataset %>%
-  group_by(hour_bin) %>%
-  summarise(mean_hour = mean(REPORT_HOUR, na.rm = TRUE),
-            mean_prob = mean(predict(model, type = "response"), na.rm = TRUE))
-
-# Plot the relationship between mean REPORT_HOUR and predicted probabilities
-plot(bin_summary$mean_hour, bin_summary$mean_prob, 
-     xlab = "Mean Report Hour (Binned)", 
-     ylab = "Mean Predicted Probability", 
-     main = "Linearity Check for REPORT_HOUR",
-     pch = 20, col = "blue")
-lines(lowess(bin_summary$mean_hour, bin_summary$mean_prob), col = "red", lwd = 2)
-
-```
+[Conclusion:
+Total Number of Plots: 1
+Draw a binning plot for REPORT_HOUR in LR Model 1 to assess the linear relationship]
 
 #### Absence of Multicollinearity
+
+[The easiest way to check for multicollinearity in your logistic regression models is to calculate the Variance Inflation Factor (VIF) for your predictors. This provides a straightforward and interpretable measure of multicollinearity.]
 
 ### Composite Risk Index
 
 #### Pearson Correlation Test
+
+
 
 # Results {#sec-result}
 
