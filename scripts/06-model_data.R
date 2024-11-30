@@ -1,83 +1,50 @@
 #### Preamble ####
-# Purpose: To build and save a logistic regression model that combines traffic and crime data to predict injury severity.
-# Author: [Your Name]
-# Date: [Current Date]
-# Contact: [Your Email]
+# Purpose: To build and save a Bayesian regression model using cleaned crime or traffic data.
+# Author: Yingke He
+# Date: 29 November 2024
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-# - Required packages must be installed.
-# - Cleaned traffic and crime datasets must be available in Parquet format.
+# - Required packages installed
+# - Cleaned datasets (`cleaned_crime_data.csv` and `cleaned_traffic_data.csv`) available
+# - Test script successfully run to ensure data quality
 
 #### Workspace setup ####
-# Load libraries
+# Load necessary libraries
 library(tidyverse)
-library(arrow)
+library(rstanarm)
 library(here)
 
-# Load datasets
-traffic_data <- read_parquet(here("data", "02-analysis_data", "cleaned_traffic_data.parquet"))
-crime_data <- read_parquet(here("data", "02-analysis_data", "cleaned_crime_data.parquet"))
+# Load data (adjust based on the dataset you're modeling)
+crime_data <- read_csv(here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
 
-#### Prepare data ####
-# Aggregate features from crime_data for spatial join with traffic_data
-crime_aggregated <- crime_data |>
+# Example: Using traffic data for the model
+# Modify the formula and variables based on your research question
+model_data <- traffic_data %>%
+  filter(!is.na(road_type), !is.na(accident_id), !is.na(injury)) %>%  # Ensure no missing values in key columns
   mutate(
-    latitude_bin = round(latitude, 3),  # Group crimes by latitude bins
-    longitude_bin = round(longitude, 3) # Group crimes by longitude bins
-  ) |>
-  group_by(latitude_bin, longitude_bin) |>
-  summarise(
-    crime_count = n(),  # Total crimes in the area
-    avg_offense_severity = mean(as.numeric(factor(offense)), na.rm = TRUE),  # Average severity of offenses
-    .groups = "drop"
+    injury = as.numeric(as.factor(injury))  # Convert injury to numeric (e.g., severity levels)
   )
 
-# Prepare traffic data and join with aggregated crime data
-traffic_model_data <- traffic_data |>
-  mutate(
-    injury_severity_binary = ifelse(impactype %in% c("Fatal", "Severe"), 1, 0),  # Binary outcome for severe injuries
-    road_class = factor(road_class),
-    vehtype = factor(vehtype),
-    latitude_bin = round(latitude, 3),
-    longitude_bin = round(longitude, 3)
-  ) |>
-  left_join(crime_aggregated, by = c("latitude_bin", "longitude_bin")) |>
-  mutate(
-    crime_count = replace_na(crime_count, 0),  # Replace missing crime data with 0
-    avg_offense_severity = replace_na(avg_offense_severity, 0)  # Replace missing severity with 0
-  ) |>
-  select(injury_severity_binary, road_class, vehtype, latitude, longitude, crime_count, avg_offense_severity) |>
-  drop_na()
-
 #### Model data ####
-# Logistic regression model
-combined_model <- glm(
-  formula = injury_severity_binary ~ vehtype + road_class + latitude + longitude + crime_count + avg_offense_severity,
-  data = traffic_model_data,
-  family = binomial()
+# Define a Bayesian regression model for predicting injuries based on other variables
+traffic_model <- stan_glm(
+  formula = injury ~ road_type + accident_id + vehicle_type,  # Example formula
+  data = model_data,
+  family = gaussian(),  # Change family if needed (e.g., binomial for binary outcomes)
+  prior = normal(location = 0, scale = 2.5, autoscale = TRUE),  # Prior for coefficients
+  prior_intercept = normal(location = 0, scale = 2.5, autoscale = TRUE),  # Prior for intercept
+  prior_aux = exponential(rate = 1, autoscale = TRUE),  # Prior for auxiliary parameters
+  seed = 304  # Set a random seed for reproducibility
 )
 
 #### Save model ####
-# Save the model to the models directory
+# Save the trained model to an RDS file
 saveRDS(
-  combined_model,
-  file = here("models", "combined_logistic_model.rds")
+  traffic_model,
+  file = here("models", "traffic_model.rds")
 )
 
-#### Evaluate model ####
-# Print summary of the model
-summary(combined_model)
-
-# Calculate pseudo R-squared and AIC
-library(pscl)
-pseudo_r2 <- pR2(combined_model)
-print(pseudo_r2)
-
-# Plot predicted probabilities
-traffic_model_data <- traffic_model_data |>
-  mutate(predicted_prob = predict(combined_model, type = "response"))
-
-ggplot(traffic_model_data, aes(x = predicted_prob, fill = factor(injury_severity_binary))) +
-  geom_histogram(binwidth = 0.05, position = "dodge") +
-  labs(title = "Predicted Probability of Severe Injury", x = "Predicted Probability", fill = "Severe Injury") +
-  theme_minimal()
+# Print a summary of the model
+print(summary(traffic_model))
