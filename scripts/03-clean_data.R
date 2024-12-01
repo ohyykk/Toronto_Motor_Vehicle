@@ -1,19 +1,17 @@
 #### Preamble ####
-# Purpose: Cleans the raw crime and traffic datasets for further analysis and saves them in Parquet format.
+# Purpose: Cleans the raw theft dataset for further analysis and includes the day of the week (`REPORT_DOW`) and saves the data in CSV format.
 # Author: [Your Name]
 # Date: [Current Date]
 # Contact: [Your Email]
 # License: MIT
 # Pre-requisites: 
-# - The `tidyverse`, `janitor`, `jsonlite`, and `arrow` packages must be installed.
-# Additional Information: Ensure the datasets are available in the specified locations.
+# - The `tidyverse`, `janitor`, `arrow`, and `here` packages must be installed.
 
 #### Workspace setup ####
 # Load required libraries
 library(tidyverse)
 library(janitor)
 library(here)
-library(jsonlite)
 library(arrow)
 
 # Ensure required directories exist
@@ -34,9 +32,10 @@ cleaned_crime_data <- crime_data |>
   mutate(
     report_date = as.Date(report_date, format = "%Y-%m-%d"),
     occ_date = as.Date(occ_date, format = "%Y-%m-%d"),
-    report_hour = as.integer(report_hour),  # Ensure `REPORT_HOUR` is numeric
     lat_wgs84 = as.numeric(lat_wgs84),
-    long_wgs84 = as.numeric(long_wgs84)
+    long_wgs84 = as.numeric(long_wgs84),
+    report_hour = as.integer(report_hour),  # Ensure hour is numeric
+    report_dow = weekdays(report_date)  # Add day of the week column
   ) |>
   filter(
     !is.na(event_unique_id) & 
@@ -44,13 +43,11 @@ cleaned_crime_data <- crime_data |>
       !is.na(division) & 
       !is.na(offence) & 
       !is.na(lat_wgs84) & 
-      !is.na(long_wgs84) & 
-      !is.na(report_hour)  # Remove rows with missing critical fields, including report_hour
+      !is.na(long_wgs84)  # Remove rows with missing critical fields
   ) |>
   filter(
     lat_wgs84 >= -90 & lat_wgs84 <= 90,  # Validate latitude
-    long_wgs84 >= -180 & long_wgs84 <= 180,  # Validate longitude
-    report_hour >= 0 & report_hour <= 23  # Validate report_hour
+    long_wgs84 >= -180 & long_wgs84 <= 180  # Validate longitude
   ) |>
   mutate(
     division = str_trim(division),  # Remove extra spaces
@@ -61,21 +58,22 @@ cleaned_crime_data <- crime_data |>
   filter(offence %in% valid_offenses) |>  # Ensure valid offense categories
   distinct(event_unique_id, .keep_all = TRUE) |>  # Ensure unique event IDs
   select(
-    event_unique_id, report_date, occ_date, report_hour, division, location_type, 
-    premises_type, offence, mci_category, hood_158, long_wgs84, lat_wgs84
+    event_unique_id, report_date, occ_date, report_hour, report_dow, division, 
+    location_type, premises_type, offence, mci_category, hood_158, long_wgs84, lat_wgs84
   ) |>  # Select relevant columns
   rename(
     event_id = event_unique_id,
     report = report_date,
     occurrence = occ_date,
     hour = report_hour,
+    day_of_week = report_dow,
     location = location_type,
     offense = offence,
     latitude = lat_wgs84,
     longitude = long_wgs84
   )
 
-# Save cleaned crime data as Parquet
+# Save cleaned crime data as CSV
 write_parquet(cleaned_crime_data, here("data", "02-analysis_data", "cleaned_crime_data.parquet"))
 
 

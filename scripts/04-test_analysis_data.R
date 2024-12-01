@@ -28,7 +28,7 @@ test_that("cleaned_crime_data has unique event IDs", {
 
 # Column validation
 test_that("cleaned_crime_data has the required number of columns", {
-  expect_equal(ncol(cleaned_crime_data), 12)  # Based on the cleaned crime data structure
+  expect_equal(ncol(cleaned_crime_data), 13)  # Based on the cleaned crime data structure
 })
 
 # Dataframe has rows
