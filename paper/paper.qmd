@@ -20,7 +20,309 @@ bibliography: references.bib
 
 library(tidyverse)
 library(palmerpenguins)
+library(knitr)
+
+library(here)
+library(car)
+
+
+# Define file paths for data
+theft_data_path <- here("data", "02-analysis_data", "cleaned_crime_data.csv")
+traffic_data_path <- here("data", "02-analysis_data", "cleaned_traffic_data.csv")
+
 ```
+
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+#### Workspace Setup ####
+library(tidyverse)
+library(here)
+
+# Load dataset
+cleaned_crime_data <- read_csv(here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+
+#### Calculate Theft Sub-Indexes ####
+
+# 1. Hour Index
+hour_index <- cleaned_crime_data %>%
+  count(hour) %>%
+  mutate(
+    proportion = n / sum(n),
+    index = proportion / 3,  # Normalize so the sum equals 1/3
+    type = as.character(hour)
+  ) %>%
+  select(type, index)
+
+# 2. Day of Week Index
+day_index <- cleaned_crime_data %>%
+  count(day_of_week) %>%
+  mutate(
+    proportion = n / sum(n),
+    index = proportion / 3,  # Normalize so the sum equals 1/3
+    type = day_of_week
+  ) %>%
+  select(type, index)
+
+# 3. Premises Type Index
+premises_index <- cleaned_crime_data %>%
+  count(premises_type) %>%
+  mutate(
+    proportion = n / sum(n),
+    index = proportion / 3,  # Normalize so the sum equals 1/3
+    type = premises_type
+  ) %>%
+  select(type, index)
+
+# Combine all indexes into one table
+theft_indexes <- bind_rows(
+  hour_index,
+  day_index,
+  premises_index
+)
+
+#### Save as CSV ####
+output_path <- here("data", "02-analysis_data", "theft_indexes.csv")
+write_csv(theft_indexes, output_path)
+
+#### Define the Theft Scoring Model ####
+# Create a theft scoring model function
+theft_scoring_model <- list(
+  hour_index = hour_index,
+  day_index = day_index,
+  premises_index = premises_index,
+  scoring_logic = function(hour, day_of_week, premises_type) {
+    # Lookup values for indexes
+    hour_score <- hour_index %>% filter(type == as.character(hour)) %>% pull(index)
+    day_score <- day_index %>% filter(type == day_of_week) %>% pull(index)
+    premises_score <- premises_index %>% filter(type == premises_type) %>% pull(index)
+    
+    # Calculate total theft risk score
+    total_score <- sum(hour_score, day_score, premises_score, na.rm = TRUE)
+    return(total_score)
+  }
+)
+
+#### Save the Theft Scoring Model ####
+rds_output_path <- here("models", "theft_scoring_model.rds")
+saveRDS(theft_scoring_model, rds_output_path)
+
+
+
+
+
+
+
+# Load datasets
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+#### Preprocess Traffic Data ####
+# Add a binned time-of-day variable
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  mutate(
+    time_of_day_bin = case_when(
+      time_of_day >= 0 & time_of_day < 600 ~ "Late Night",
+      time_of_day >= 600 & time_of_day < 1200 ~ "Morning",
+      time_of_day >= 1200 & time_of_day < 1800 ~ "Afternoon",
+      time_of_day >= 1800 & time_of_day <= 2359 ~ "Evening",
+      TRUE ~ "Unknown"
+    )
+  )
+
+# Preprocess severity as a binary variable
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  mutate(
+    severity = case_when(
+      injury == "Major" | accident_classification == "Fatal" ~ 1,  # Severe cases
+      injury %in% c("Minor", "Minimal") ~ 0,                       # Non-severe cases
+      TRUE ~ NA_real_                                              # NA for missing or undefined
+    )
+  ) %>%
+  filter(!is.na(severity))  # Remove rows where severity could not be determined
+
+
+
+#### Logistic Regression Model for Collision Severity ####
+collision_severity_model <- glm(
+  formula = severity ~ hood_158 + time_of_day_bin + traffic_control +
+    visibility_conditions + lighting_conditions + road_conditions,
+  family = binomial(link = "logit"),
+  data = cleaned_traffic_data
+)
+
+# Summarize the model
+cat("Collision Severity Model Summary:\n")
+summary(collision_severity_model)
+
+#### Add Predicted Probabilities to Traffic Data ####
+# Filter traffic data for consistent training and prediction
+filtered_traffic_data <- cleaned_traffic_data %>%
+  filter(!is.na(severity))  # Match rows used for training
+
+# Debugging: Check sizes for consistency
+cat("Rows in filtered data (used for model training): ", nrow(filtered_traffic_data), "\n")
+cat("Rows in original traffic data: ", nrow(cleaned_traffic_data), "\n")
+
+# Generate predictions for the filtered dataset
+filtered_traffic_data <- filtered_traffic_data %>%
+  mutate(
+    collision_probability = predict(collision_severity_model, newdata = filtered_traffic_data, type = "response")
+  )
+
+# Merge predictions back into the original dataset
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  left_join(
+    filtered_traffic_data %>%
+      select(id, collision_probability),  # Ensure unique identifier is used
+    by = "id"
+  )
+
+# Debugging: Check for successful merging
+cat("Rows in cleaned traffic data after merging predictions: ", nrow(cleaned_traffic_data), "\n")
+
+#### Save Model and Results ####
+# Save the logistic regression model
+saveRDS(collision_severity_model, here("models", "collision_severity_model.rds"))
+
+
+
+#### Model Diagnostics ####
+# Correlation between predictors (optional)
+cat("Correlation matrix of numeric predictors:\n")
+correlation_matrix <- cleaned_traffic_data %>%
+  select(time_of_day, fatal_no) %>%  # Replace with relevant numeric predictors
+  cor(use = "complete.obs")
+print(correlation_matrix)
+
+
+#### Save Collision Risk Scores ####
+# Select relevant columns to save
+collision_risk_scores <- cleaned_traffic_data %>%
+  select(id, hood_158, collision_probability)
+
+# Define output path
+collision_output_path <- here("data", "02-analysis_data", "collision_risk_scores.csv")
+
+# Save as CSV
+write_csv(collision_risk_scores, collision_output_path)
+
+
+
+#### Load Data ####
+# Load theft indexes
+theft_indexes <- read_csv(here("data", "02-analysis_data", "theft_indexes.csv"))
+
+# Load theft data
+cleaned_crime_data <- read_csv(here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+
+# Load traffic data with collision probabilities
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+#### Ensure Collision Probability ####
+# If collision_probability is missing, calculate it
+if (!"collision_probability" %in% colnames(cleaned_traffic_data)) {
+  cleaned_traffic_data <- cleaned_traffic_data %>%
+    mutate(
+      time_of_day_bin = case_when(
+        time_of_day >= 0 & time_of_day < 600 ~ "Late Night",
+        time_of_day >= 600 & time_of_day < 1200 ~ "Morning",
+        time_of_day >= 1200 & time_of_day < 1800 ~ "Afternoon",
+        time_of_day >= 1800 & time_of_day <= 2359 ~ "Evening",
+        TRUE ~ "Unknown"
+      ),
+      severity = case_when(
+        injury == "Major" | accident_classification == "Fatal" ~ 1,
+        injury %in% c("Minor", "Minimal") ~ 0,
+        TRUE ~ NA_real_
+      )
+    ) %>%
+    filter(!is.na(severity))
+  
+  collision_severity_model <- glm(
+    formula = severity ~ hood_158 + time_of_day_bin + traffic_control +
+      visibility_conditions + lighting_conditions + road_conditions,
+    family = binomial(link = "logit"),
+    data = cleaned_traffic_data
+  )
+  
+  cleaned_traffic_data <- cleaned_traffic_data %>%
+    mutate(
+      collision_probability = predict(collision_severity_model, newdata = ., type = "response")
+    )
+}
+
+#### Calculate Theft Component ####
+# Aggregate theft indexes for simplicity
+hour_index <- theft_indexes %>% filter(str_detect(type, "^\\d+$"))
+day_index <- theft_indexes %>% filter(type %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+premises_index <- theft_indexes %>% filter(type %in% c("House", "Outside", "Commercial"))
+
+# Add indexes to the theft data
+cleaned_crime_data <- cleaned_crime_data %>%
+  mutate(
+    hour = as.character(hour),  # Ensure hour is a character
+    hour = if_else(hour == "24", "0", hour)  # Handle 24:00 case
+  ) %>%
+  left_join(hour_index, by = c("hour" = "type")) %>%
+  rename(hour_index = index) %>%
+  left_join(day_index, by = c("day_of_week" = "type")) %>%
+  rename(day_index = index) %>%
+  left_join(premises_index, by = c("premises_type" = "type")) %>%
+  rename(premises_index = index) %>%
+  mutate(
+    theft_component = hour_index + day_index + premises_index  # Sum theft sub-indexes
+  )
+
+#### Add Theft Component to Traffic Data ####
+# Add the average theft component by neighborhood
+theft_by_neighborhood <- cleaned_crime_data %>%
+  group_by(hood_158) %>%
+  summarize(avg_theft_component = mean(theft_component, na.rm = TRUE))
+
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  left_join(theft_by_neighborhood, by = "hood_158") %>%
+  mutate(avg_theft_component = replace_na(avg_theft_component, 0))  # Replace NA with 0
+
+#### Calculate Final Risk Index ####
+# Define weights for components
+weight_collision <- 0.7
+weight_theft <- 0.3
+
+# Calculate risk index
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  mutate(
+    risk_index = weight_collision * collision_probability + weight_theft * avg_theft_component
+  )
+
+#### Save Final Risk Index ####
+# Save the final dataset with the risk index
+output_path <- here("data", "02-analysis_data", "final_risk_index.csv")
+write_csv(cleaned_traffic_data %>% select(id, hood_158, risk_index), output_path)
+
+#### Save the Risk Calculation Model ####
+# Define the final risk model
+final_risk_model <- list(
+  collision_model = collision_severity_model,
+  theft_indexes = theft_indexes,
+  weight_collision = weight_collision,
+  weight_theft = weight_theft,
+  risk_calculation_logic = function(collision_probability, avg_theft_component) {
+    risk_index <- weight_collision * collision_probability + weight_theft * avg_theft_component
+    return(risk_index)
+  }
+)
+
+# Save the final risk model as RDS
+rds_output_path <- here("models", "final_risk_model.rds")
+saveRDS(final_risk_model, rds_output_path)
+
+
+
+#### End of Script ####
+```
+
 
 # Introduction {#sec-intro}
 
@@ -66,12 +368,10 @@ Additional details about the dataset are available in the datasheet, accessible 
 
 The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.
 
+Need two graphs
 ```{r}
 
 ```
-
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
 ```{r}
 
@@ -80,120 +380,279 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 
 ## Predictor Variables
 
-### Collision Probability
+### Theft index
 
-#### Neighborhood ID
+#### Hour of the Day
+#### Day of the Week
 #### Premises Type
-#### Report Hour 
-#### Location Type
-#### Report Day
 
-### Theft Probability
+### Collision Probability
 
 #### Neighborhood ID
 #### Road Surface Condition
 #### Lighting Condition
 #### Traffic Control
+#### Time of Day
+#### Visibility
+
 
 # Model {#sec-model}
 
-The main idea of this composite risk score model is to calculate an index of risk for owning and riding a motorbike. The modeling strategy has two primary objectives. The first objective is to estimate the likelihood of theft \( P(\text{Theft}) \) and collision \( P(\text{Collision}) \) under diverse environmental and situational conditions using logistic regression models. The second objective is to combine these probabilities into a unified Risk Index, providing actionable insights into the risk for owning and riding a motorbike
+The main purpose of this composite risk score model is to calculate a Risk Index for owning and riding a motorbike, which integrates the risks of theft and collisions. The modeling strategy has two primary objectives. The first objective is to estimate the likelihood of collisions under various environmental and situational conditions using a logistic regression model. The second objective is to derive a theft risk score based on time of day, day of the week, and premises type, combining these components into a unified Risk Index to provide actionable insights into motorbike-related risks. The models were developed in R [@citeR] using the `stats` package for logistic regression and the `tidyverse` package for data preprocessing and manipulation. The theft model calculates sub-indexes for specific predictors, while the collision model uses logistic regression to estimate probabilities based on predictors such as neighborhood ID, road surface condition, lighting condition, and traffic control. Both models are designed to enable reliable predictions under diverse conditions and are integrated into the final Risk Index, which highlights areas, times, and conditions with elevated risks. 
 
-The models were run in R [@citeR] using the `stats` package to implement logistic regression models predicting theft and collision probabilities. The theft model incorporates predictor variables such as neighborhood ID, premises type, report hour, location type, and report day, while the collision model includes neighborhood ID, road surface condition, lighting condition, and traffic control. 
+Detailed model diagnostics, variable descriptions, and performance metrics are included in [Appendix @sec-model-details].
 
-Both models estimate the log-odds of their respective probabilities using the predictors,  enabling reliable predictions under varying environmental and situational conditions. Model diagnostics and background details, including variable descriptions and performance metrics, are included in [Appendix @sec-model-details]. 
+## Model Set-Up
 
-## Model Set-up
+### Theft Risk Sub-Indexes
 
-The logistic regression model for theft probability takes the form of the following equation:
+To capture theft risk without relying on logistic regression due to the absence of negative (non-theft) cases, we calculated sub-indexes for three critical factors:
 
+-Hour of the Day: Risk distribution across 24 hours, normalized so the sum equals 1/3.
+
+-Day of the Week: Risk distribution across 7 days, normalized so the sum equals 1/3.
+
+-Premises Type: Risk distribution across premises types (House, Outside, Commercial), normalized so the sum equals 1/3.
+
+The total theft component is calculated as:
 \begin{align*}
-\log\left(\frac{P(\text{Theft})}{1 - P(\text{Theft})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Premises Type} + \beta_3 \cdot \text{Report Hour} \\
-&\quad + \beta_4 \cdot \text{Location Type} + \beta_5 \cdot \text{Report Day} + \epsilon
+C_{\text{Theft}} &= \text{Hour Index} + \text{Day Index} + \text{Premises Type Index}
 \end{align*}
 
-This model utilizes the following predictor variables:
+This approach ensures proportional representation of each factor while accounting for varying risks based on time and location characteristics.
 
-- **Neighborhood ID** (`hood_158`): Unique identifier for the neighborhood.
-- **Premises Type** (`premises_type`): Type of premises where the theft occurred like parking lot, garage
-- **Report Hour** (`REPORT_HOUR`):  Hour of the day the theft was reported.
-- **Location Type** (`location`):Location of the theft like indoors and outdoors.
-- **Report Day** (`REPORT_DOW`): Day of the Week Offence was Reported.
-
-The logistic regression model for collision probability takes the form of the following equation:
-
+### Collision Probability Model
+A logistic regression model was used to predict the likelihood of severe collisions P(Collision) based on several predictors. The log-odds of the collision probability are modeled as:
+\ 
 
 \begin{align*}
-\log\left(\frac{P(\text{Collision})}{1 - P(\text{Collision})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Road Surface Condition} + \beta_3 \cdot \text{Light} \\
-&\quad + \beta_4 \cdot \text{Traffic Control} + \epsilon
+\log\left(\frac{P(\text{Collision})}{1 - P(\text{Collision})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Road Surface Condition} + \beta_3 \cdot \text{Lighting Condition} \\
+&\quad + \beta_4 \cdot \text{Traffic Control} + \beta_5 \cdot \text{Road Visibility} + \beta_6 \cdot \text{Time of Day} + \epsilon
+\end{align*}
+
+The model prediction utilizes the following predictor variables:
+
+- Neighborhood ID (`hood_158`): Unique identifier for the neighborhood.
+- Road Surface Condition (`road_conditions`): Conditions such as dry, wet, or icy.
+- Lighting Condition (`lighting_conditions`): Visibility levels, such as daylight or artificial light.
+- Traffic Control (`traffic_control`): Presence of traffic management devices (e.g., stop signs, signals).
+- Road Visibility (`visibility_conditions`): Road visibility conditions, such as clear, snow or rain
+- Time of Day (`time`): Time where collision occured in Toronto
+
+The model assigns coefficients as follows:
+
+\begin{align*}
+\beta_i \text{ to each variable, enabling the calculation of collision probability }\\ 
+P(\text{Collision})\text{ under specific environmental and situational conditions.} 
 \end{align*}
 
 
-This model utilizes the following predictor variables:
 
-- **Neighborhood ID** (`hood_158`): Unique identifier for the neighborhood.
-- **Road Surface Condition** (`road_conditions`): Road surface condition like wet and dry.
-- **Lighting Condition** (`lighting_conditions`): Lighting conditions at the time of the collision like dark or clear.
-- **Traffic Control** (`traffic_control`):Type of traffic control present like stop signs or traffic signals
-After fitting both models, combine the probabilities into a weighted risk index: 
+### Risk Index Calculation
 
+The final Risk Index integrates the collision probability P(Collision) and theft component T using weighted aggregation:
 
 \begin{align*}
-\text{Risk Index} &= w_1 \cdot P(\text{Theft}) + w_2 \cdot P(\text{Collision})
+\text{Risk Index} = w_1\cdot P(\text{Collision}) + w_2\cdot T
 \end{align*}
 
+Weights are defined as:
 \begin{align*}
-\text{where weights } w_1 \text{and } w_2 \text{ are adjust based on the relative importance of theft and collision risks.}
+w_1 = 0.7, \quad w_2 = 0.3
 \end{align*}
+These reflect the relative importance of collision and theft risks, emphasizing collision severity due to its greater immediate impact.
 
-## Model justification
 
-Logistic regression was selected for this analysis due to its simplicity and effectiveness in estimating probabilities for binary outcomes, such as theft and collision. This statistical method is well-suited for modeling the log-odds of an event's occurrence as a linear combination of predictor variables, providing a clear framework for understanding the relationships between independent variables and the dependent outcome. Its ability to estimate odds ratios allows for an intuitive interpretation of the impact of predictor variables, making it particularly effective for identifying and quantifying risks in diverse scenarios.
+## Model Justification
 
-This model's strengths include its flexibility in handling both categorical and continuous predictors, enabling the integration of a wide range of variables such as neighborhood characteristics, premises type, lighting conditions, road surface conditions, time of day, and environmental conditions. Additionally, logistic regression’s ability to include interaction terms and manage potential multicollinearity enhances its effectiveness in capturing complex relationships between predictors and the likelihood of thefts and collisions. Utilizing these features enables the model to deliver a thorough evaluation of the factors affecting theft and collision probabilities, addressing the first objectives of the modelling strategy. 
+The analysis adopts a hybrid approach that combines sub-index calculations for theft risk with logistic regression for collision probability. This design ensures that the model reflects the specific data characteristics and practical considerations when assessing motorbike-related risks. Logistic regression is not utilized for theft risk due to the absence of negative (non-theft) cases in the dataset. Instead, theft risk is represented through sub-index calculations for three critical factors: hour of the day, day of the week, and premises type. Each factor contributes equally to the total theft component. The Hour of the Day Index captures temporal variations in theft risk across 24 hours, while the Day of the Week Index accounts for weekly patterns of theft. The Premises Type Index reflects variations in risk based on location type, such as houses, outdoor spaces, or commercial premises. These sub-indexes are normalized so their contributions to the theft component are proportional and balanced. This approach ensures an accurate representation of theft risk patterns while providing actionable insights into temporal and spatial risk factors.
 
-After estimating the probabilities of theft and collision, these probabilities are combined into a composite Risk Index using a weighted formula. This Risk Index offers a unified measure of risk, allowing for comparative evaluations of the relative safety of motorbike ownership and usage across varying contexts.
+For collision risk, the model utilizes logistic regression due to its effectiveness in estimating probabilities for binary outcomes. The log-odds of collision probability are modeled as a function of neighborhood-specific characteristics, road surface conditions, lighting conditions, and traffic control measures. By including these predictors, the model accounts for diverse factors that influence collision risks. Logistic regression’s ability to handle both categorical and continuous variables makes it an appropriate choice for this component, delivering statistically reliable estimates and facilitating the interpretation of individual predictors’ effects.
 
-The modeling approach is justified by logistic regression’s ability to deliver clear, interpretable, and statistically reliable risk estimates. Its statistical efficiency, with its capacity to manage complex, large datasets, makes it an ideal choice for accurately predicting theft and collision risk, while the composite Risk Index facilitates a clearer understanding of the risks associated with motorbike ownership and usage.
+The final Risk Index integrates the theft and collision components using a weighted formula. The collision probability component is weighted at 0.7, reflecting its higher immediate impact on safety, while the theft component is weighted at 0.3. This weighting scheme prioritizes collision risk while ensuring that theft risk is not overlooked. By combining these components, the Risk Index provides a unified measure of motorbike-related risks, enabling stakeholders to assess and compare safety conditions across different contexts.
 
-## Model Assumtions and Validations
+This modeling approach is justified by its ability to adapt to the data’s constraints while maintaining statistical rigor and interpretability. The sub-index method for theft risk is tailored to the dataset’s characteristics, avoiding assumptions about unobserved cases, and the use of logistic regression for collision risk ensures robust and reliable predictions. Together, these components form a comprehensive and practical framework for evaluating motorbike ownership and usage risks, addressing both immediate safety concerns and long-term theft risks.
 
-To validate the use of logistic regression models, the four main assumptions: binary nature of the outcome, linearity of the logit, indipendence of observations, and lack of multicollinearity will be assessed [@kononen2011logistic]. To validate the use of a composite Risk Index, the correlation of the index with observed outcomes will be assess using a Pearson correlation test.
 
-### Logistic Regression Models
+## Model Assumptions and Validations
+
+
+### Theft Sub-Index [add one sentence of validation]
+
+The theft sub-index approach is based on two key assumptions. First, it assumes that the observed proportions of theft occurrences across categories, such as hour of the day, day of the week, and premises type, accurately represent the overall theft risk. Second, it assumes that these categories contribute independently to the theft risk, meaning the risk associated with one category does not influence or depend on another.
+
+### Composite Risk Index [Add one sentence of assumption]
+
+The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components $w_1$ and $w_2$ to evaluate the robustness and reliability of the final Risk Index.
+
+### Collision Model
+
+The logistic regression model for collision severity relies on several assumptions. First, the response variable (`severity`) is binary (1 = severe, 0 = non-severe), fulfilling the requirement for a binary outcome. Second, the data consist of independently reported collision incidents, ensuring that observations are uncorrelated. Third, the log-odds of collision severity are modeled as a linear combination of predictor variables; although most predictors are categorical, their contributions to the log-odds inherently satisfy this linearity assumption. Finally, to address the assumption of no multicollinearity, Variance Inflation Factor (VIF) will be calculated for all predictors. Predictors with high VIF values will be mitigated through re-categorization or removal to ensure stable and reliable coefficient estimates.
 
 #### Binary Nature of the Outcome
 
-A fundamental assumption of logistic regression is that the response variable is binary or dichotomous, meaning it can take on only two possible outcomes [@nick2007logistic]. This assumption is satisfied in both models. In the theft model, the response variable indicates whether a theft occurred, with a value of 1 representing the occurrence of theft and 0 representing its absence. Similarly, in the collision model, the response variable denotes whether a collision occurred, where 1 represents the occurrence of a collision and 0 indicates no collision. 
+A fundamental assumption of logistic regression is that the response variable is binary or dichotomous, meaning it can take on only two possible outcomes [@nick2007logistic]. This assumption is satisfied in the collision model, where the response variable (`severity`) distinguishes between severe (1) and non-severe (0) collision cases. 
 
-The logistic regression model does not directly predict 1 or 0. Instead, it estimates the probability that the response variable equals 1, given the predictor variables. For instance, the theft model outputs the probability of theft occurring (P(Theft)), and the collision model outputs the probability of a collision occurring (P(Collision)). These probabilities range between 0 and 1, allowing for detailed predictions of the likelihood of the respective events.
+In the theft dataset, however, all entries represent theft cases, precluding the binary nature required for logistic regression. Consequently, the theft model was adapted to calculate proportion-based sub-indexes rather than relying on a binary outcome. These sub-indexes represent relative risk based on temporal and spatial factors, such as hour of the day, day of the week, and premises type.
+
+In the collision model:
+- The model estimates the probability of a severe collision (\(P(\text{Collision})\)) given environmental and situational predictors. The response variable (`severity`) is defined as:
+  \begin{align*}
+  P(\text{Collision}) = \frac{\exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}{1 + \exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}
+  \end{align*}
+  where:
+  \begin{align*}
+  \beta_0 &\text{ is the intercept,} \\
+  \beta_k &\text{ are the coefficients, and} \\
+  X_k &\text{ are the predictor variables.}
+  \end{align*}
+
+The logistic regression model does not directly predict 1 or 0. Instead, it provides a continuous probability ranging between 0 and 1. This probability reflects the likelihood of an event (e.g., a severe collision) occurring under the given conditions.
+
+#### Independence of Observations
+
+The collision model assumes that each observation is independent of the others, a fundamental requirement for logistic regression. This assumption is satisfied in the dataset, as each row represents a distinct and independently reported collision incident. The observations are not repeated or correlated, ensuring that the logistic regression model provides unbiased estimates of the relationships between predictor variables and the response variable. By meeting this assumption, the collision model maintains its validity for estimating probabilities of severe collisions and contributes robustly to the composite Risk Index.
 
 #### Linear Relationship in the Log-Odds
 
-[Identifying Continuous Variables in Your Models:
-For LR Model 1 (Theft Model):
-Continuous Variable:
-REPORT_HOUR (Hour of the day the theft was reported
-For LR Model 2 (Collision Model):
-No Continuous Variables]
+One of the key assumptions in logistic regression is that a linear relationship exists between the continuous predictors and the logit of the outcome variable [@stoltzfus2011]. This means that the log-odds of the binary dependent variable should have a linear association with any continuous independent variables in the model. It is important to test this assumption to ensure the validity of the model.
 
-[Conclusion:
-Total Number of Plots: 1
-Draw a binning plot for REPORT_HOUR in LR Model 1 to assess the linear relationship]
+The collision risk logistic regression model incorporates both categorical and continuous predictor variables. Among these, Time of Day serves as the sole continuous predictor, representing the time an incident occurred as a numerical value ranging from 0 (midnight) to 2359 (just before midnight). The analysis emphasizes the continuous predictor, Time of Day, to evaluate its role within the collision model.
+
+Linearity is assessed using smoothed scatter plots of the predicted logit values:
+
+\begin{align*}
+\text{logit} = \log\left(\frac{P}{1 - P}\right)
+\end{align*}
+
+where P represents the predicted probability of collision from the logistic regression model plotted against the continuous predictors. These plots are intended to visualize the relationship between each predictor and the logit of the outcome variable, providing insight into whether the relationship is approximately linear.
+
+```{r}
+#| label: fig-linear-time-of-day
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Logit Plot for Time of Day in the Collision Probability Model"
+#| fig-pos: H
+# Load necessary libraries
+library(tidyverse)
+library(ggplot2)
+library(here)
+
+# Use here() to construct file paths and then load the data into data frames
+collision_data <- read_csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Merge collision data with time_of_day from cleaned traffic data
+collision_data <- collision_data %>%
+  left_join(cleaned_traffic_data %>% select(id, time_of_day), by = "id") %>%
+  mutate(
+    collision_probability = ifelse(collision_probability <= 0, 0.0001, collision_probability),
+    collision_probability = ifelse(collision_probability >= 1, 0.9999, collision_probability),
+    logit = log(collision_probability / (1 - collision_probability))  # Logit transformation
+  )
+
+# Smoothed scatter plot for time_of_day vs logit
+ggplot(collision_data, aes(x = time_of_day, y = logit)) +
+  geom_point(alpha = 0.5, color = "darkgrey") +
+  geom_smooth(method = "loess", color = "blue", fill = "lightblue") +
+  coord_cartesian(ylim = c(-5, 5)) +  # Restrict the y-axis range
+  labs(
+    x = "Time of Day",
+    y = "Logit"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold")  # Center title and adjust size
+  )
+
+
+```
+
+Figure @fig-linear-time-of-day illustrates the relationship between variable Time of Day and the predicted values of the collision probability model. The horizontal axis represents the reported time of day in minutes since midnight, while the vertical axis displays the logit values. Gray points depict the raw data, and the blue smoothed line represents the average trend. To evaluate the linearity assumption, the smoothed line is compared to a hypothetical linear relationship. Significant deviations of the smoothed line from a straight line may suggest a potential violation of the linearity assumption.
+
+In this plot, the smoothed line shows a relatively stable trend with minimal deviations, indicating no substantial evidence against the linearity assumption. Local fluctuations are minor and likely reflect natural variations in the data rather than a systematic departure from linearity.
 
 #### Absence of Multicollinearity
 
-[The easiest way to check for multicollinearity in your logistic regression models is to calculate the Variance Inflation Factor (VIF) for your predictors. This provides a straightforward and interpretable measure of multicollinearity.]
+Another key assumption of logistic regression is the absence of multicollinearity among predictor variables. Multicollinearity occurs when two or more predictors are highly correlated, leading to inflated standard errors of the regression coefficients and reducing the reliability of the model's estimates. The Variance Inflation Factor (VIF) is commonly used to assess multicollinearity, with VIF values greater than 5 indicating potential issues, and values above 10 suggesting severe multicollinearity [@stoltzfus2011].
 
-### Composite Risk Index
+In the collision risk model, the predictors include both categorical variables (Lighting Conditions, Road Conditions, Visibility Conditions and Traffic Control) and one continuous variable (Time of Day). VIF calculations are performed to evaluate the degree of multicollinearity among these predictors.
 
-#### Pearson Correlation Test
+If multicollinearity is detected, strategies such as combining correlated variables, removing redundant predictors, or using regularization techniques like ridge regression can be employed [@stoltzfus2011]. However, if VIF values remain below the threshold, it confirms that multicollinearity is not a concern in this analysis.
 
+The following table presents the VIF values for all predictors in the collision risk model.
+
+
+```{r}
+#| label: tbl-vif
+#| echo: false
+#| warning: false
+#| message: false
+#| tbl-cap: "VIF values for predictor variables in the collision model."
+#| tbl-pos: H
+library(performance)
+
+
+
+# Run check_collinearity on the collision model
+vif_result <- check_collinearity(collision_severity_model)
+
+# Convert results to a data frame
+vif_df <- as.data.frame(vif_result)
+
+# Create a data frame with GVIF values
+gvif_data <- data.frame(VIF = round(vif_df$VIF, 2))
+
+# Convert the data frame into a kable table
+vif_table <- kable(
+  t(gvif_data), # transpose
+  col.names = c("hood id", "time of day", "traffic control", "visibility", "lighting condition", "road condition"),
+  escape = FALSE,
+  align = "ccccc"
+)
+
+vif_table
+
+
+```
+
+The results of the VIF analysis for the collision risk model are presented in Table @tbl-vif. Most predictors exhibit VIF values well below the commonly used threshold of 5, indicating no significant multicollinearity among them. However, two predictors, Visibility Conditions and Road conditions, show slightly elevated VIF values of 7.29 and 7.51, respectively. While these values are higher than the others, they remain below the severe multicollinearity threshold of 10, suggesting that multicollinearity, though present to some extent, is not critical.
+
+The slightly elevated VIF values can be attributed to a potential overlap in the information captured by Visibility Conditions and Road Conditions. For instance, poor visibility often coincides with adverse road conditions, such as wet or icy surfaces, leading to some degree of correlation between these variables.
+
+Despite this overlap, both predictors are retained in the model because they provide distinct and meaningful contributions to understanding collision risk. Visibility Conditions directly reflects environmental factors like fog, heavy rain, or low light, which impair drivers' ability to see hazards. Conversely, Road Conditions` account for the physical state of the driving surface, such as wet, icy, or damaged roads, which influence vehicle handling and stopping distance. Together, these variables capture complementary aspects of collision risk, ensuring that the model provides a comprehensive assessment.
+
+The inclusion of both variables aligns with the theoretical framework underpinning the model and enhances its practical utility by addressing multiple dimensions of risk. While some degree of multicollinearity is observed, its impact on model stability is minimal, and the predictors' theoretical importance justifies their inclusion.
 
 
 # Results {#sec-result}
 
-Our results are summarized in @tbl-modelresults.
+## When Risk Peaks: Temporal Trends in the Index
+
+Time-of-Day and Day-of-Week Analysis of the Risk Index
+
+Plot Ideas:
+Bar: Show Risk Index variations across hours of the day and days of the week, highlighting theft and collision components separately.
+
+Time Series Plot: Display Risk Index trends over a longer period, revealing potential seasonal effects.
+
+```{r}
+```
+
+```{r}
+
+```
+
+## Conditions of Danger: Environmental Drivers of Risk
+
+Exploring How Environmental and Situational Factors Impact the Risk Index
+
+Plot Ideas:
+Violin Plot: Show the Risk Index distribution under varying road surface conditions (e.g., dry, wet, icy).
+
+Faceted Plot: Break down the Risk Index by lighting conditions (e.g., daylight, artificial light) or traffic control types.
+
 
 ```{r}
 
@@ -203,35 +662,74 @@ Our results are summarized in @tbl-modelresults.
 
 ```
 
-## First Result Point
+## Mapping the Risk: Neighborhood-Level Insights
 
-## Second Result Point
+Spatial Patterns in the Distribution of the Risk Index
 
-## Third Result Point
+Plot Ideas:
+Choropleth Map: Display the Risk Index across neighborhoods with color gradients indicating risk levels.
+
+Bar Chart: Rank neighborhoods by their average Risk Index to identify the most vulnerable areas.
+
+```{r}
+
+```
+
+```{r}
+
+```
 
 # Discussion {#sec-discussion}
 
-## First discussion point
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
+## Temporal Risk Patterns and Behavioral Recommendations
 
-## Second discussion point
+Focus: This section can interpret the temporal trends in the Risk Index and their implications for motorbike owners and policymakers. For instance, if risks peak at certain hours or days, actionable recommendations can be made for owners to avoid high-risk times or take precautions.
 
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+Key Points:
+Discuss high-risk times of day or days of the week for both theft and collisions.
+Recommendations for motorbike owners to reduce risk exposure, such as avoiding specific time periods or enhancing security measures during peak theft hours.
+Potential scheduling adjustments for law enforcement patrols to align with high-risk periods..
 
-## Third discussion point
+## Environmental and Situational Influences on Risk
 
-## Weaknesses and next steps
+Focus: This section can examine how road, lighting, and traffic conditions contribute to the Risk Index, linking these findings to actionable changes in infrastructure or urban planning.
 
-Weaknesses and next steps should also be included.
+Key Points:
+Discuss the significant environmental predictors of risk, such as poor road surface conditions or inadequate lighting.
+Recommend urban planning measures, such as improved road maintenance or installation of streetlights, to mitigate risks.
+Highlight how different environmental factors interact to amplify risks, suggesting multi-faceted approaches to improve safety.
 
+## Policy Implications of Spatial Risk Disparities
+
+Focus: This section can discuss the significant disparities in the Risk Index across neighborhoods. Highlight how certain areas are disproportionately affected by theft or collisions and the potential socioeconomic or infrastructure factors contributing to these risks.
+
+Key Points:
+Prioritizing high-risk neighborhoods for targeted interventions, such as improved street lighting or traffic control measures.
+Suggestions for law enforcement strategies to reduce theft in hotspots.
+Need for localized awareness campaigns in high-risk areas.
+
+## Limitations
+
+
+
+## Future Research
+
+
+Future Work1: Explore how temporal risk patterns change with seasons or special events (e.g., holidays, festivals) to refine recommendations further.
+
+Future Work2: Develop predictive models integrating weather or real-time traffic data to dynamically assess and communicate motorbike risks.
+
+Future Work3: Investigate the correlation between neighborhood-level Risk Index values and broader social or economic indicators, such as income levels or population density.
 \newpage
 
 \appendix
 
-# Appendix {.unnumbered}
+# Appendix {-}
 
-# Additional data details
+# Additional Data Details {#sec-data_details}
+
+## Data Cleaning
 
 # Model details {#sec-model-details}
 
@@ -256,5 +754,86 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 ```
 
 \newpage
+
+# Idealized Methodology for a Survey on Motor Risk {#sec-survey}
+
+## Survey Overview
+
+This survey aims to assess factors contributing to motorbike risks, including theft and collisions, by gathering data from motorbike owners and riders. The survey will explore demographic characteristics, riding behavior, motorbike usage patterns, and perceptions of environmental and situational risks.
+
+
+## Sampling Approach 
+
+The survey will use a stratified random sampling method to ensure diverse representation across:
+
+- Geographic regions (urban, suburban, rural areas).
+- Demographic groups (age, gender, income, and education levels).
+- Riding experience (novices, intermediate, and experienced riders).
+
+The target population includes licensed motorbike riders and owners. A sample size of approximately 1,000 respondents is proposed to ensure statistical validity across strata.
+
+
+
+## Survey structure
+
+The survey will consist of five main sections:
+
+- Demographics: Basic information on respondents (e.g., age, gender, income, education, geographic location).
+
+- Riding Behavior: Frequency, duration, and purpose of motorbike usage.
+
+- Risk Awareness and Perception: Personal experiences with collisions or theft and perceptions of environmental risks.
+
+- Situational Factors: Details of riding conditions such as time of day, weather, road surface, and lighting.
+
+- Preventive Measures: Actions taken by riders to mitigate theft or collision risks (e.g., use of locks, helmets, or avoiding high-risk areas).
+
+### Question Types
+
+- Closed-ended questions: For quantitative data (e.g., multiple choice, Likert scales, ranking).
+
+- Open-ended questions: To capture nuanced insights and personal experiences.
+
+- Matrix questions: To evaluate attitudes across multiple dimensions efficiently.
+
+### Question List
+
+Here are examples of survey questions:
+
+Demographics:
+What is your age group? (e.g., 18–24, 25–34, etc.)
+What is your highest level of education completed?
+
+Riding Behavior:
+How often do you ride your motorbike? (Daily, Weekly, Monthly, Rarely)
+For what purposes do you primarily use your motorbike? (Commuting, Recreation, Delivery/Work, Other)
+
+Risk Awareness and Perception:
+On a scale of 1–5, how would you rate the theft risk in your neighborhood?
+Have you experienced a motorbike theft or collision in the past year? (Yes/No)
+
+Situational Factors:
+What time of day do you usually ride? (Morning, Afternoon, Evening, Night)
+In what weather conditions do you typically ride? (Clear, Rainy, Snowy)
+
+Preventive Measures:
+What measures do you take to secure your motorbike against theft? (Select all that apply: Lock, Alarm, GPS Tracker, Parking in Secure Locations)
+Do you avoid specific times or areas due to perceived collision risks? (Yes/No)
+
+## Recruitment Strategy
+
+Participants will be recruited through a combination of online and offline channels:
+
+Online platforms: Motorbike owner forums, social media groups, and email lists of motorbike organizations.
+
+Offline channels: Flyers at motorbike dealerships, repair shops, and riding schools. Incentives such as small gift cards or entry into a raffle may be provided to encourage participation.
+
+## Linkage to Literature
+
+The survey design is informed by prior studies on motor vehicle risk perception, road safety, and crime prevention. Key references include:
+
+Research on environmental and situational predictors of road accidents.
+Studies on the effectiveness of theft prevention measures.
+Literature on sampling methods and survey design for risk assessment.
 
 # References
