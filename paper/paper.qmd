@@ -32,7 +32,6 @@ traffic_data_path <- here("data", "02-analysis_data", "cleaned_traffic_data.csv"
 
 ```
 
-
 ```{r}
 #| include: false
 #| warning: false
@@ -108,12 +107,6 @@ theft_scoring_model <- list(
 #### Save the Theft Scoring Model ####
 rds_output_path <- here("models", "theft_scoring_model.rds")
 saveRDS(theft_scoring_model, rds_output_path)
-
-
-
-
-
-
 
 # Load datasets
 cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
@@ -323,16 +316,15 @@ saveRDS(final_risk_model, rds_output_path)
 #### End of Script ####
 ```
 
-
 # Introduction {#sec-intro}
 
-Decisions surrounding motorbike ownership and usage carry significant implications for personal safety and financial liability. Recent statistics highlight the increased risks associated with owning and riding motorbikes, including a heightened likelihood of theft and collisions compared to other vehicles [@Yasmin2016]. These risks are influenced by various factors such as geographic location, road conditions, time of day, and type of motorbike, making it essential to develop tools that effectively assess and mitigate these dangers.[can add one more sentence + citations] 
+Decisions surrounding motorbike ownership and usage carry significant implications for personal safety and financial liability. Recent statistics highlight the increased risks associated with owning and riding motorbikes, including a heightened likelihood of theft and collisions compared to other vehicles [@Yasmin2016]. These risks are influenced by various factors such as geographic location, road conditions, time of day, and type of motorbike, making it essential to develop tools that effectively assess and mitigate these dangers.\[can add one more sentence + citations\]
 
 This study introduces a composite risk score model to assess the risks associated with owning and riding a motorbike. Using data from Open Data Toronto, the model evaluates two critical events: motorbike theft and collisions. Logistic regression is employed to estimate the probabilities of these events, which are then combined into a single, interpretable composite risk score. This metric, incorporating factors such as neighborhood characteristics, road and lighting conditions, and time of day, is designed to guide motorbike users, insurers, and policymakers in risk assessment and decision-making, while informing strategies to mitigate these risks.
 
-The primary estimand of the analysis is the composite risk score, derived from the individual probabilities of motorbike theft and collision. This score is calculated using predictor variables such as neighborhood characteristics, road and lighting conditions, time of day, and other contextual factors, which were selected for their documented relevance to motorbike-related risks. 
+The primary estimand of the analysis is the composite risk score, derived from the individual probabilities of motorbike theft and collision. This score is calculated using predictor variables such as neighborhood characteristics, road and lighting conditions, time of day, and other contextual factors, which were selected for their documented relevance to motorbike-related risks.
 
-This analysis confirms and extends three key findings: (1) material properties significantly influence motor efficiency, with high-conductivity materials yielding higher energy savings; (2) geometric optimization of motor components enhances torque generation and reduces energy losses; and (3) operational conditions, such as load and temperature, exhibit nonlinear effects, underscoring the need for adaptive motor control strategies. Furthermore, our projections suggest that integrating advanced materials and control systems could improve motor efficiency by up to 15% by 2050, aligning with global energy transition goals [To be updated..].
+This analysis confirms and extends three key findings: (1) material properties significantly influence motor efficiency, with high-conductivity materials yielding higher energy savings; (2) geometric optimization of motor components enhances torque generation and reduces energy losses; and (3) operational conditions, such as load and temperature, exhibit nonlinear effects, underscoring the need for adaptive motor control strategies. Furthermore, our projections suggest that integrating advanced materials and control systems could improve motor efficiency by up to 15% by 2050, aligning with global energy transition goals \[To be updated..\].
 
 The structure of the paper is organized as follows: following @sec-intro, @sec-data outlines the data collection and preprocessing procedures, along with a detailed description of the outcome variable and the predictor variables used in the analysis. @sec-model introduces the logistic regression models applied to estimate the probabilities of theft and collision, as well as the method used to combine these probabilities into a composite risk score. @sec-result then presents the main findings, including insights into how different factors contribute to the risks of owning and riding a motorbike. Finally, @sec-discussion interprets the results, highlighting significant trends and implications for motorbike risk assessment, and concludes with a discussion on the limitations of the analysis and future research directions.
 
@@ -340,19 +332,19 @@ The structure of the paper is organized as follows: following @sec-intro, @sec-d
 
 We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
 
-[Libraries To be updated...]
+\[Libraries To be updated...\]
 
 Details about the data cleaning process and the criteria for variable selection are provided in Appendix A.
 
 ## Source
 
-This study utilized two datasets published by the Toronto Police Service. The first dataset focuses on motor vehicle collisions involving killed or seriously injured persons (KSI), while the second examines thefts from motor vehicles. 
+This study utilized two datasets published by the Toronto Police Service. The first dataset focuses on motor vehicle collisions involving killed or seriously injured persons (KSI), while the second examines thefts from motor vehicles.
 
 The Motor Vehicle Collisions dataset includes all reported incidents in which a person was either killed or seriously injured since 2006. It offers detailed information about each collision, such as the type of incident, the severity of injuries, and the location of the event, when available. Additionally, the dataset includes fields for both the old 140 and new 158 neighborhood structures in Toronto, allowing for flexible neighborhood-level analysis across different definitions.
 
 The Theft from Motor Vehicle dataset contains all reported occurrences of thefts from vehicles, categorized by reported date. These offences are classified based on the value of the stolen items, distinguishing between theft under and theft over thresholds. Each occurrence number may include multiple rows, representing the various offences associated with a single event. The dataset excludes "unfounded" occurrences, adhering to Statistics Canada’s definition that these events were determined not to have occurred or been attempted. Like the KSI dataset, this dataset includes fields for both the old and new neighborhood structures, enabling comprehensive geographic analyses of theft trends.
 
-[Add variable types and trends]
+\[Add variable types and trends\]
 
 ## Data Measurement and Limitations
 
@@ -366,39 +358,170 @@ Additional details about the dataset are available in the datasheet, accessible 
 
 ## Outcome Variables
 
-The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.
+The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.The Risk Index integrates two underlying components: the theft component, derived from proportional sub-indexes for temporal and spatial factors, and the collision probability, estimated using a logistic regression model. By combining these elements, the Risk Index provides a unified measure of risk, enabling the identification of high-risk scenarios and areas. This section examines the distribution of the Risk Index through visualizations to reveal key patterns, variations, and potential drivers of motorbike-related risks. Two graphs are presented: (1) a histogram with density overlay to illustrate the overall distribution of the Risk Index, and (2) a boxplot by neighborhood to highlight spatial differences in risk.
 
-Need two graphs
 ```{r}
+#| label: fig-risk-index-histogram
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Distribution of the Overall Risk Index"
+#| fig-pos: H
+#| fig-width: 8 
+#| fig-height: 4 
+
+# Load necessary libraries
+library(tidyverse)
+library(here)
+
+# Load the final Risk Index dataset
+final_risk_index <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+
+# Plot a histogram with density overlay
+ggplot(final_risk_index, aes(x = risk_index)) +
+  geom_histogram(aes(y = ..density..), bins = 40, fill = "darkgrey", alpha = 0.6, color = "black") +
+  geom_density(color = "darkred", size = 1) +
+  labs(
+    
+    x = "Risk Index",
+    y = "Density"
+  ) +
+  theme_minimal()
 
 ```
 
+@fig-risk-index-histogram shows the distribution of the Risk Index across all observations in the dataset. The Risk Index exhibits a unimodal distribution, skewed slightly to the left, with the majority of values concentrated between 0.45 and 0.65. This indicates that most motorbike-related risks fall within a moderate range. The density curve overlay reveals a smooth progression in risk levels, with the peak occurring around a Risk Index value of 0.55, suggesting that this is the most common level of composite risk. The left tail, representing lower risk levels, is relatively small, while the right tail, corresponding to higher risks, extends further, indicating the presence of a smaller number of high-risk cases.
+
+The skewness and spread of the distribution highlight the variability in the combined risks of theft and collision. The extended tail on the higher end of the Risk Index suggests that certain environmental or situational factors disproportionately elevate risks in specific cases. This insight can inform targeted interventions, focusing on the outliers with elevated Risk Index values to mitigate the most critical risks.
+
+Building on the distribution of the Risk Index shown in the histogram, this box plot further dissects the data by grouping neighborhoods into risk categories based on their average Risk Index values. Neighborhoods are classified into three categories—Low Risk, Moderate Risk, and High Risk—using quartiles.
+
 ```{r}
+#| label: fig-risk-index-boxplot
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Risk Index Distribution by Risk Category"
+#| fig-pos: H
+
+library(ggplot2)
+library(dplyr)
+
+risk_index_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+
+# Assume `risk_index_data` contains the `risk_index` values for each neighborhood
+# Group neighborhoods by average Risk Index
+grouped_data <- risk_index_data %>%
+  group_by(hood_158) %>%
+  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE)) %>%
+  mutate(risk_category = case_when(
+    avg_risk_index <= quantile(avg_risk_index, 0.25) ~ "Low Risk",
+    avg_risk_index > quantile(avg_risk_index, 0.25) & avg_risk_index <= quantile(avg_risk_index, 0.75) ~ "Moderate Risk",
+    avg_risk_index > quantile(avg_risk_index, 0.75) ~ "High Risk"
+  ))
+
+# Add risk categories directly to the `risk_index_data`
+risk_index_data <- risk_index_data %>%
+  left_join(grouped_data %>% select(hood_158, risk_category), by = "hood_158")
+
+# Box plot of Risk Index by Risk Category with custom colors
+ggplot(risk_index_data, aes(x = risk_category, y = risk_index, fill = risk_category)) +
+  geom_boxplot(outlier.color = "darkred", outlier.shape = 16, alpha = 0.7) +
+  scale_fill_manual(
+    values = c("Low Risk" = "#603601", "Moderate Risk" = "#3a6a91", "High Risk" = "#cfb886")
+  ) +
+  labs(
+    x = "Risk Category",
+    y = "Risk Index"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 ```
 
+@fig-risk-index-boxplot highlights the distribution of the Risk Index across three defined categories: High Risk, Low Risk and Moderate Risk. Each category represents a grouping of neighborhoods based on their average Risk Index values. The plot reveals distinct differences in the distribution of the Risk Index between these categories.
+
+The High Risk category exhibits a higher median Risk Index, with a relatively narrow interquartile range (IQR), indicating consistent high-risk values across neighborhoods in this group. Conversely, the Low Risk category has a significantly lower median, with a similarly narrow IQR, suggesting stable low-risk conditions in these neighborhoods. The Moderate Risk category shows greater variability in its distribution, with a wider IQR and overlapping values with both High Risk and Low Risk categories. This suggests that neighborhoods in the Moderate Risk group exhibit diverse risk profiles, likely influenced by varying environmental and situational factors.
 
 ## Predictor Variables
 
+The predictor variables in this study are organized into two distinct models: Theft Index and Collision Probability, each designed to capture and explain critical aspects of theft and collision risks, respectively. @fig-tree provide a visual overview of the hierarchical relationships between the predictor variables and the overall risk framework, offering a structured understanding of the factors contributing to these incidents
+
+```{r}
+#| label: fig-tree
+#| fig-cap: "Hierarchical relationship between risk factors contributing to theft and collision probabilities."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8 # Increased width for better text display
+#| fig-height: 4  # Adjusted height for spacing
+
+# Load required libraries
+library(tidygraph)
+library(ggraph)
+
+# Define the tree structure as a dataframe
+tree_data <- data.frame(
+  from = c("Risk Index", "Risk Index", "Theft Index", "Theft Index", "Theft Index",
+           "Collision Probability", "Collision Probability", "Collision Probability", 
+           "Collision Probability", "Collision Probability", "Collision Probability"),
+  to = c("Theft Index", "Collision Probability", "Hour of the Day", "Day of the Week", 
+         "Premises Type", "Neighborhood ID", "Road Surface Condition", 
+         "Lighting Condition", "Traffic Control", "Time of Day", "Road Visibility")
+)
+
+# Convert to graph object
+tree_graph <- as_tbl_graph(tree_data)
+
+# Plot the tree diagram with horizontal layout and curved lines
+ggraph(tree_graph, layout = "dendrogram", circular = FALSE) +
+  geom_edge_bend(color = "gray", curvature = 0.5, arrow = arrow(length = unit(4, "mm")), end_cap = circle(4, "mm")) +
+  geom_node_point(size = 6, color = "grey") +
+  geom_node_text(
+    aes(label = name, hjust = ifelse(name == "Risk Index", 1.3, -0.2)), # Conditional hjust
+    vjust = -0.5, size = 4, color = "black", angle = 0
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  ) +
+  coord_flip()
+
+```
+
 ### Theft index
 
+The Theft Index focuses on the temporal and locational characteristics that influence theft occurrences. By incorporating variables such as Hour of the Day, Day of the Week, and Premises Type, this model identifies patterns tied to specific times and locations, highlighting when and where thefts are most likely to occur.
+
 #### Hour of the Day
+
 #### Day of the Week
+
 #### Premises Type
 
 ### Collision Probability
 
-#### Neighborhood ID
-#### Road Surface Condition
-#### Lighting Condition
-#### Traffic Control
-#### Time of Day
-#### Visibility
+The Collision Probability model, on the other hand, examines situational and environmental conditions affecting the likelihood of collisions. Variables such as Neighborhood ID, Road Surface Condition, Lighting Condition, Traffic Control, Time of Day, and Visibility offer insights into the contextual factors that contribute to traffic incidents, capturing the dynamic interplay between environmental conditions and human interactions.
 
+#### Neighborhood ID
+
+#### Road Surface Condition
+
+#### Lighting Condition
+
+#### Traffic Control
+
+#### Time of Day
+
+#### Visibility
 
 # Model {#sec-model}
 
-The main purpose of this composite risk score model is to calculate a Risk Index for owning and riding a motorbike, which integrates the risks of theft and collisions. The modeling strategy has two primary objectives. The first objective is to estimate the likelihood of collisions under various environmental and situational conditions using a logistic regression model. The second objective is to derive a theft risk score based on time of day, day of the week, and premises type, combining these components into a unified Risk Index to provide actionable insights into motorbike-related risks. The models were developed in R [@citeR] using the `stats` package for logistic regression and the `tidyverse` package for data preprocessing and manipulation. The theft model calculates sub-indexes for specific predictors, while the collision model uses logistic regression to estimate probabilities based on predictors such as neighborhood ID, road surface condition, lighting condition, and traffic control. Both models are designed to enable reliable predictions under diverse conditions and are integrated into the final Risk Index, which highlights areas, times, and conditions with elevated risks. 
+The main purpose of this composite risk score model is to calculate a Risk Index for owning and riding a motorbike, which integrates the risks of theft and collisions. The modeling strategy has two primary objectives. The first objective is to estimate the likelihood of collisions under various environmental and situational conditions using a logistic regression model. The second objective is to derive a theft risk score based on time of day, day of the week, and premises type, combining these components into a unified Risk Index to provide actionable insights into motorbike-related risks. The models were developed in R [@citeR] using the `stats` package for logistic regression and the `tidyverse` package for data preprocessing and manipulation. The theft model calculates sub-indexes for specific predictors, while the collision model uses logistic regression to estimate probabilities based on predictors such as neighborhood ID, road surface condition, lighting condition, and traffic control. Both models are designed to enable reliable predictions under diverse conditions and are integrated into the final Risk Index, which highlights areas, times, and conditions with elevated risks.
 
 Detailed model diagnostics, variable descriptions, and performance metrics are included in [Appendix @sec-model-details].
 
@@ -414,54 +537,51 @@ To capture theft risk without relying on logistic regression due to the absence 
 
 -Premises Type: Risk distribution across premises types (House, Outside, Commercial), normalized so the sum equals 1/3.
 
-The total theft component is calculated as:
-\begin{align*}
+The total theft component is calculated as: \begin{align*}
 C_{\text{Theft}} &= \text{Hour Index} + \text{Day Index} + \text{Premises Type Index}
 \end{align*}
 
 This approach ensures proportional representation of each factor while accounting for varying risks based on time and location characteristics.
 
 ### Collision Probability Model
-A logistic regression model was used to predict the likelihood of severe collisions P(Collision) based on several predictors. The log-odds of the collision probability are modeled as:
-\ 
 
+A logistic regression model was used to predict the likelihood of severe collisions P(Collision) based on several predictors. The log-odds of the collision probability are modeled as:  
+
+```{=tex}
 \begin{align*}
 \log\left(\frac{P(\text{Collision})}{1 - P(\text{Collision})}\right) &= \beta_0 + \beta_1 \cdot \text{HOOD}_{158} + \beta_2 \cdot \text{Road Surface Condition} + \beta_3 \cdot \text{Lighting Condition} \\
 &\quad + \beta_4 \cdot \text{Traffic Control} + \beta_5 \cdot \text{Road Visibility} + \beta_6 \cdot \text{Time of Day} + \epsilon
 \end{align*}
-
+```
 The model prediction utilizes the following predictor variables:
 
-- Neighborhood ID (`hood_158`): Unique identifier for the neighborhood.
-- Road Surface Condition (`road_conditions`): Conditions such as dry, wet, or icy.
-- Lighting Condition (`lighting_conditions`): Visibility levels, such as daylight or artificial light.
-- Traffic Control (`traffic_control`): Presence of traffic management devices (e.g., stop signs, signals).
-- Road Visibility (`visibility_conditions`): Road visibility conditions, such as clear, snow or rain
-- Time of Day (`time`): Time where collision occured in Toronto
+-   Neighborhood ID (`hood_158`): Unique identifier for the neighborhood.
+-   Road Surface Condition (`road_conditions`): Conditions such as dry, wet, or icy.
+-   Lighting Condition (`lighting_conditions`): Visibility levels, such as daylight or artificial light.
+-   Traffic Control (`traffic_control`): Presence of traffic management devices (e.g., stop signs, signals).
+-   Road Visibility (`visibility_conditions`): Road visibility conditions, such as clear, snow or rain
+-   Time of Day (`time`): Time where collision occured in Toronto
 
 The model assigns coefficients as follows:
 
+```{=tex}
 \begin{align*}
 \beta_i \text{ to each variable, enabling the calculation of collision probability }\\ 
 P(\text{Collision})\text{ under specific environmental and situational conditions.} 
 \end{align*}
-
-
-
+```
 ### Risk Index Calculation
 
 The final Risk Index integrates the collision probability P(Collision) and theft component T using weighted aggregation:
 
+```{=tex}
 \begin{align*}
 \text{Risk Index} = w_1\cdot P(\text{Collision}) + w_2\cdot T
 \end{align*}
-
-Weights are defined as:
-\begin{align*}
+```
+Weights are defined as: \begin{align*}
 w_1 = 0.7, \quad w_2 = 0.3
-\end{align*}
-These reflect the relative importance of collision and theft risks, emphasizing collision severity due to its greater immediate impact.
-
+\end{align*} These reflect the relative importance of collision and theft risks, emphasizing collision severity due to its greater immediate impact.
 
 ## Model Justification
 
@@ -473,15 +593,13 @@ The final Risk Index integrates the theft and collision components using a weigh
 
 This modeling approach is justified by its ability to adapt to the data’s constraints while maintaining statistical rigor and interpretability. The sub-index method for theft risk is tailored to the dataset’s characteristics, avoiding assumptions about unobserved cases, and the use of logistic regression for collision risk ensures robust and reliable predictions. Together, these components form a comprehensive and practical framework for evaluating motorbike ownership and usage risks, addressing both immediate safety concerns and long-term theft risks.
 
-
 ## Model Assumptions and Validations
 
-
-### Theft Sub-Index [add one sentence of validation]
+### Theft Sub-Index \[add one sentence of validation\]
 
 The theft sub-index approach is based on two key assumptions. First, it assumes that the observed proportions of theft occurrences across categories, such as hour of the day, day of the week, and premises type, accurately represent the overall theft risk. Second, it assumes that these categories contribute independently to the theft risk, meaning the risk associated with one category does not influence or depend on another.
 
-### Composite Risk Index [Add one sentence of assumption]
+### Composite Risk Index \[Add one sentence of assumption\]
 
 The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components $w_1$ and $w_2$ to evaluate the robustness and reliability of the final Risk Index.
 
@@ -491,17 +609,13 @@ The logistic regression model for collision severity relies on several assumptio
 
 #### Binary Nature of the Outcome
 
-A fundamental assumption of logistic regression is that the response variable is binary or dichotomous, meaning it can take on only two possible outcomes [@nick2007logistic]. This assumption is satisfied in the collision model, where the response variable (`severity`) distinguishes between severe (1) and non-severe (0) collision cases. 
+A fundamental assumption of logistic regression is that the response variable is binary or dichotomous, meaning it can take on only two possible outcomes [@nick2007logistic]. This assumption is satisfied in the collision model, where the response variable (`severity`) distinguishes between severe (1) and non-severe (0) collision cases.
 
 In the theft dataset, however, all entries represent theft cases, precluding the binary nature required for logistic regression. Consequently, the theft model was adapted to calculate proportion-based sub-indexes rather than relying on a binary outcome. These sub-indexes represent relative risk based on temporal and spatial factors, such as hour of the day, day of the week, and premises type.
 
-In the collision model:
-- The model estimates the probability of a severe collision (\(P(\text{Collision})\)) given environmental and situational predictors. The response variable (`severity`) is defined as:
-  \begin{align*}
+In the collision model: - The model estimates the probability of a severe collision ((P(\text{Collision}))) given environmental and situational predictors. The response variable (`severity`) is defined as: \begin{align*}
   P(\text{Collision}) = \frac{\exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}{1 + \exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}
-  \end{align*}
-  where:
-  \begin{align*}
+  \end{align*} where: \begin{align*}
   \beta_0 &\text{ is the intercept,} \\
   \beta_k &\text{ are the coefficients, and} \\
   X_k &\text{ are the predictor variables.}
@@ -521,10 +635,11 @@ The collision risk logistic regression model incorporates both categorical and c
 
 Linearity is assessed using smoothed scatter plots of the predicted logit values:
 
+```{=tex}
 \begin{align*}
 \text{logit} = \log\left(\frac{P}{1 - P}\right)
 \end{align*}
-
+```
 where P represents the predicted probability of collision from the logistic regression model plotted against the continuous predictors. These plots are intended to visualize the relationship between each predictor and the logit of the outcome variable, providing insight into whether the relationship is approximately linear.
 
 ```{r}
@@ -534,6 +649,9 @@ where P represents the predicted probability of collision from the logistic regr
 #| message: false
 #| fig-cap: "Logit Plot for Time of Day in the Collision Probability Model"
 #| fig-pos: H
+#| fig-width: 8
+#| fig-height: 3.5
+
 # Load necessary libraries
 library(tidyverse)
 library(ggplot2)
@@ -555,7 +673,7 @@ collision_data <- collision_data %>%
 # Smoothed scatter plot for time_of_day vs logit
 ggplot(collision_data, aes(x = time_of_day, y = logit)) +
   geom_point(alpha = 0.5, color = "darkgrey") +
-  geom_smooth(method = "loess", color = "blue", fill = "lightblue") +
+  geom_smooth(method = "loess", color = "darkred", fill = "lightblue") +
   coord_cartesian(ylim = c(-5, 5)) +  # Restrict the y-axis range
   labs(
     x = "Time of Day",
@@ -582,7 +700,6 @@ In the collision risk model, the predictors include both categorical variables (
 If multicollinearity is detected, strategies such as combining correlated variables, removing redundant predictors, or using regularization techniques like ridge regression can be employed [@stoltzfus2011]. However, if VIF values remain below the threshold, it confirms that multicollinearity is not a concern in this analysis.
 
 The following table presents the VIF values for all predictors in the collision risk model.
-
 
 ```{r}
 #| label: tbl-vif
@@ -621,111 +738,487 @@ The results of the VIF analysis for the collision risk model are presented in Ta
 
 The slightly elevated VIF values can be attributed to a potential overlap in the information captured by Visibility Conditions and Road Conditions. For instance, poor visibility often coincides with adverse road conditions, such as wet or icy surfaces, leading to some degree of correlation between these variables.
 
-Despite this overlap, both predictors are retained in the model because they provide distinct and meaningful contributions to understanding collision risk. Visibility Conditions directly reflects environmental factors like fog, heavy rain, or low light, which impair drivers' ability to see hazards. Conversely, Road Conditions` account for the physical state of the driving surface, such as wet, icy, or damaged roads, which influence vehicle handling and stopping distance. Together, these variables capture complementary aspects of collision risk, ensuring that the model provides a comprehensive assessment.
+Despite this overlap, both predictors are retained in the model because they provide distinct and meaningful contributions to understanding collision risk. Visibility Conditions directly reflects environmental factors like fog, heavy rain, or low light, which impair drivers' ability to see hazards. Conversely, Road Conditions\` account for the physical state of the driving surface, such as wet, icy, or damaged roads, which influence vehicle handling and stopping distance. Together, these variables capture complementary aspects of collision risk, ensuring that the model provides a comprehensive assessment.
 
 The inclusion of both variables aligns with the theoretical framework underpinning the model and enhances its practical utility by addressing multiple dimensions of risk. While some degree of multicollinearity is observed, its impact on model stability is minimal, and the predictors' theoretical importance justifies their inclusion.
-
 
 # Results {#sec-result}
 
 ## When Risk Peaks: Temporal Trends in the Index
 
-Time-of-Day and Day-of-Week Analysis of the Risk Index
+Understanding the temporal dynamics of the Risk Index provides critical insights into when risks are most elevated, helping to inform motorbike owners and policymakers about high-risk periods. This section examines variations in the Risk Index over time of a day, and utilizes a time series analysis to reveal potential seasonal effects and long-term trends. These analyses provide a comprehensive view of how risks evolve temporally, highlighting critical periods for intervention.
 
-Plot Ideas:
-Bar: Show Risk Index variations across hours of the day and days of the week, highlighting theft and collision components separately.
-
-Time Series Plot: Display Risk Index trends over a longer period, revealing potential seasonal effects.
+### Time-of-Day Analysis
 
 ```{r}
+#| label: fig-risk-index-timeofday
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Temporal Trends: Risk Index Variations by Hour of the Day"
+#| fig-pos: H
+#| fig-width: 8
+#| fig-height: 4
+
+# Load necessary data
+final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+collision_risk_scores <- read_csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
+
+# Convert 'id' to character in both datasets if necessary
+final_risk_data$id <- as.character(final_risk_data$id)
+cleaned_traffic_data$id <- as.character(cleaned_traffic_data$id)
+collision_risk_scores$id <- as.character(collision_risk_scores$id)
+
+# Merge the final risk index with the traffic data based on 'id'
+merged_data <- left_join(final_risk_data, cleaned_traffic_data, by = "id")
+
+# Merge the collision risk scores into the merged data
+merged_data <- left_join(merged_data, collision_risk_scores, by = "id")
+
+# Create 'time_of_day_bin' based on 'time_of_day' in cleaned_traffic_data
+merged_data$time_of_day_bin <- case_when(
+  merged_data$time_of_day >= 0 & merged_data$time_of_day < 600 ~ "Early Morning",
+  merged_data$time_of_day >= 600 & merged_data$time_of_day < 1200 ~ "Morning",
+  merged_data$time_of_day >= 1200 & merged_data$time_of_day < 1800 ~ "Afternoon",
+  merged_data$time_of_day >= 1800 & merged_data$time_of_day < 2400 ~ "Evening"
+)
+
+# Group by 'time_of_day_bin' and calculate average values for risk index and collision index
+summary_data <- merged_data %>%
+  group_by(time_of_day_bin) %>%
+  summarize(
+    avg_risk_index = mean(risk_index, na.rm = TRUE),
+    avg_collision_index = mean(collision_probability
+, na.rm = TRUE)
+  )
+
+# Theft hour indexes (24-hour data points)
+theft_hour_indexes <- c(0.005335554, 0.003690682, 0.002343943, 0.002158895, 0.001572909,
+                        0.002415906, 0.006353319, 0.012295419, 0.018587055, 0.02577309,
+                        0.026174027, 0.025526359, 0.025248787, 0.024107657, 0.021969323,
+                        0.020334731, 0.018196398, 0.016448721, 0.016479562, 0.015400115,
+                        0.013806645, 0.01254215, 0.009211284, 0.007360803)
+
+# Create a mapping of the theft hour indexes to the time of day bins
+theft_hour_bins <- c("Early Morning", "Early Morning", "Early Morning", "Early Morning", "Early Morning", 
+                     "Morning", "Morning", "Morning", "Morning", "Morning", 
+                     "Morning", "Morning", "Morning", "Afternoon", "Afternoon", 
+                     "Afternoon", "Afternoon", "Afternoon", "Afternoon", 
+                     "Evening", "Evening", "Evening", "Evening", "Evening")
+
+# Create a dataframe for the theft data, with time_of_day_bin mapped accordingly
+theft_hour_data <- data.frame(
+  time_of_day_bin = theft_hour_bins,
+  theft_index = theft_hour_indexes
+)
+
+# Summarize theft data by time_of_day_bin to match the bin structure used in the plot
+theft_summary_data <- theft_hour_data %>%
+  group_by(time_of_day_bin) %>%
+  summarize(avg_theft_index = mean(theft_index))
+
+# Merge with existing summary data for risk and collision indexes
+final_plot_data <- left_join(summary_data, theft_summary_data, by = "time_of_day_bin")
+
+# Plot: Risk Index, Collision Index, and Theft Hour Index by Time of Day Bin
+ggplot(final_plot_data, aes(x = time_of_day_bin)) +
+  geom_bar(aes(y = avg_risk_index), stat = "identity", fill = "#967145") +
+  geom_line(aes(y = avg_collision_index), group = 1, color = "darkred", size = 1) + # Collision index line
+  geom_text(aes(y = avg_risk_index, label = round(avg_risk_index, 2)), vjust = -0.5) +  # Add labels for risk index
+  geom_text(aes(y = avg_collision_index, label = round(avg_collision_index, 2)), vjust = 1.5, color = "black") +  # Add labels for collision index
+  geom_line(aes(y = avg_theft_index * 10), color = "green", size = 1, linetype = "dashed") +  # Theft index line (scaled by 100)
+  geom_point(aes(y = avg_theft_index * 10), color = "green", size = 2) +  # Theft index points
+  labs(
+    
+    x = "Time of Day Bin",
+    y = "Average Risk Index"
+  ) +
+  theme_minimal()
+
+
+
+
+
 ```
+
+@fig-risk-index-timeofday illustrates how the total Risk Index varies throughout the day. This Risk Index is composed of two key components: collision risk and theft risk. The bar heights represent the overall Risk Index, while the red line indicates collision risk and the green line reflects theft risk.To better visualize the theft risk, the values have been multiplied by 10, as they are typically quite small (less than 1/3 of the total Hour Risk Index throughout the day).
+
+The collision risk (red line) shows significant peaks during commuting hours—between 7–9 AM and 5–7 PM—corresponding to high traffic volumes, which indicates a direct relationship between collision risk and traffic patterns. The theft risk (green line), which has been scaled for better visualization, remains consistently low throughout the day, showing no significant variation across time bins. This suggests that theft risk is relatively stable, regardless of the time of day. The total Risk Index, represented by the bar heights, shows slight fluctuations, with the highest values occurring during morning hours. This is likely due to the heightened collision risk in the morning, which has a greater influence on the overall risk during these periods.
+
+### Time Series Analysis
+
+This time series analysis explores how the Risk Index evolves over time, offering a long-term view across the years and a more focused examination of a specific year. By visualizing these temporal trends, we can reveal potential seasonal effects, fluctuations, and patterns that might not be immediately apparent in a snapshot of data. The following section presents the trends in the Risk Index over both the full timespan (2006-2021) and the specific year 2020.
+
+#### Longterm
 
 ```{r}
+#| label: fig-risk-index-timeseries-longterm
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Temporal Trends: Risk Index Variations Over Time with Rolling Average"
+#| fig-pos: H
+#| fig-width: 8
+#| fig-height: 3.5
+
+# Load necessary libraries
+library(tidyverse)
+library(lubridate)
+library(here)
+
+# Load the cleaned traffic data
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Load the final risk index if not already in `cleaned_traffic_data`
+if (!"risk_index" %in% colnames(cleaned_traffic_data)) {
+  final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+  cleaned_traffic_data <- cleaned_traffic_data %>%
+    left_join(final_risk_data, by = "id")
+}
+
+# Convert `date` to Date format if not already
+cleaned_traffic_data <- cleaned_traffic_data %>%
+  mutate(date = as.Date(report_date))
+
+# Aggregate data by date to calculate the average Risk Index
+risk_trends <- cleaned_traffic_data %>%
+  group_by(date) %>%
+  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE))
+
+# Create a 6-month rolling average for clearer trend
+risk_trends <- risk_trends %>%
+  arrange(date) %>%
+  mutate(rolling_avg = zoo::rollmean(avg_risk_index, 6, fill = NA, align = "center"))
+
+# Create the time series plot for the entire period
+ggplot(risk_trends, aes(x = date, y = avg_risk_index)) +
+  geom_line(color = "#967145", size = 1, alpha = 0.7) +
+  geom_line(aes(x = date, y = rolling_avg), color = "grey", size = 1, linetype = "dashed") +
+  labs(
+    
+    x = "Year",
+    y = "Average Risk Index"
+  ) +
+  scale_x_date(
+    date_breaks = "2 years", 
+    date_labels = "%Y"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+
 
 ```
+
+@fig-risk-index-timeseries-longterm provides a broad overview of the Risk Index over the entire period from 2006 to 2021, with the average Risk Index for each day represented by the blue line. To facilitate clearer interpretation, a 6-month rolling average is included, shown by the dashed red line. The plot highlights long-term trends in risk levels, showing periods of heightened and reduced risk. Although there are some fluctuations, the rolling average smooths these variations, enabling us to observe the general trend over time. The x-axis labels every three years for better clarity, making it easier to track shifts in risk levels. From this, we can discern if certain years or periods saw notable increases or decreases in the Risk Index, possibly suggesting underlying external factors like policy changes or events that affected the risk.
+
+#### Year 2020
+
+```{r}
+#| label: fig-risk-index-timeseries-year
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Risk Index Variations in 2020"
+#| fig-pos: H
+#| fig-width: 8.5
+#| fig-height: 3.5
+
+# Filter data for a specific year (e.g., 2020)
+risk_trends_2020 <- cleaned_traffic_data %>%
+  filter(year(date) == 2020) %>%
+  group_by(date) %>%
+  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE))
+
+risk_trends_2020 <- risk_trends_2020 %>%
+  mutate(month = month(date, label = TRUE))
+
+ggplot(risk_trends_2020, aes(x = date, y = avg_risk_index)) +
+  geom_line(color = "#66471d", size = 0.8) +
+  facet_wrap(~month, scales = "free_x") +  # Facet by month
+  labs(
+    x = "Month",
+    y = "Average Risk Index"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12)
+  )
+
+```
+
+@fig-risk-index-timeseries-year provides a detailed, month-by-month breakdown of the Risk Index for the year 2020. This faceted layout offers a clear view of short-term fluctuations and potential seasonal patterns by presenting trends for each month separately. The graph highlights variations in risk levels across the months, making it easier to identify distinct periods of higher or lower risk. These trends may correspond to factors such as weather conditions, holidays, or other contextual events. For instance, spikes or dips in risk within specific months could reflect changes in traffic volume, seasonal behaviors, or other dynamic factors influencing motorbike-related incidents throughout the year.
+
 
 ## Conditions of Danger: Environmental Drivers of Risk
 
-Exploring How Environmental and Situational Factors Impact the Risk Index
+Understanding how environmental and situational factors contribute to variations in the Risk Index is crucial for identifying the conditions under which motorbike risks are heightened. This section explores how different factors, such as road surface conditions, lighting conditions, and traffic control types, influence the Risk Index. By breaking down the data into categories based on these factors, we can reveal specific conditions that might increase the likelihood of accidents or theft. The following visualizations provide insight into the distribution of risk under varying environmental conditions, highlighting the factors that contribute to motorbike-related incidents.
 
-Plot Ideas:
-Violin Plot: Show the Risk Index distribution under varying road surface conditions (e.g., dry, wet, icy).
-
-Faceted Plot: Break down the Risk Index by lighting conditions (e.g., daylight, artificial light) or traffic control types.
-
+To better understand how environmental factors influence the Risk Index, we examine the distribution of the Risk Index under various road surface conditions. This analysis explores whether different surface types—such as dry, wet, icy, and others—affect the level of risk associated with traffic incidents. The following violin plot visually compares the Risk Index across different road surface conditions, providing insight into how these factors may contribute to the overall risk. 
 
 ```{r}
+#| label: fig-risk-index-lighting-conditions
+#| fig-cap: "Risk Index by Lighting Conditions"
+#| fig-subcap: ["Low Light (Dark & Artificial)", "Dawn and Artificial Light", "Bright Daylight and Artificial Light", "Other Lighting Conditions"]
+#| echo: false
+#| warning: false
+#| message: false
+#| layout-ncol: 2
+#| layout-nrow: 2
 
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+collision_risk_scores <- read_csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
+
+# Convert 'id' to character in both datasets if necessary
+final_risk_data$id <- as.character(final_risk_data$id)
+cleaned_traffic_data$id <- as.character(cleaned_traffic_data$id)
+collision_risk_scores$id <- as.character(collision_risk_scores$id)
+
+# Merge the final risk index with the traffic data based on 'id'
+merged_data <- left_join(final_risk_data, cleaned_traffic_data, by = "id")
+
+# Merge the collision risk scores into the merged data
+merged_data <- left_join(merged_data, collision_risk_scores, by = "id")
+
+# Preprocess lighting conditions: Group 'NA' as 'Other' and create lighting condition categories for the full dataset
+merged_data$lighting_conditions <- as.character(merged_data$lighting_conditions)  # Ensure it's a character vector
+
+# Convert "NA" (actual value in the data) to "Other"
+merged_data$lighting_conditions[merged_data$lighting_conditions == "NA"] <- "Other"
+
+# Group lighting conditions into four categories, including "Other"
+merged_data$lighting_condition_group <- case_when(
+  merged_data$lighting_conditions %in% c("Dark", "Dark, Artificial") ~ "Low Light (Dark & Artificial)",
+  merged_data$lighting_conditions %in% c("Dawn", "Dawn, Artificial") ~ "Dawn and Artificial Light",
+  merged_data$lighting_conditions %in% c("Daylight", "Daylight, Artificial") ~ "Bright Daylight and Artificial Light",
+  merged_data$lighting_conditions == "Other" ~ "Other Lighting Conditions"
+)
+
+# First Plot: Low Light (Dark & Artificial)
+plot_dark <- ggplot(merged_data %>% filter(lighting_condition_group == "Low Light (Dark & Artificial)"), aes(x = risk_index, fill = lighting_condition_group)) +
+  geom_density(alpha = 0.7) +
+  scale_fill_manual(values = c("Low Light (Dark & Artificial)" = "#54350a")) +  # Custom color
+  labs(x = "Risk Index", y = "Density", title = "Low Light (Dark & Artificial)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Second Plot: Dawn and Artificial Light
+plot_dawn <- ggplot(merged_data %>% filter(lighting_condition_group == "Dawn and Artificial Light"), aes(x = risk_index, fill = lighting_condition_group)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Dawn and Artificial Light" = "#54350a")) +  # Custom color
+  labs(x = "Risk Index", y = "Density", title = "Dawn and Artificial Light") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Third Plot: Bright Daylight and Artificial Light
+plot_daylight <- ggplot(merged_data %>% filter(lighting_condition_group == "Bright Daylight and Artificial Light"), aes(x = risk_index, fill = lighting_condition_group)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Bright Daylight and Artificial Light" = "#54350a")) +  # Custom color
+  labs(x = "Risk Index", y = "Density", title = "Bright Daylight and Artificial Light") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Fourth Plot: Other Lighting Conditions
+plot_other <- ggplot(merged_data %>% filter(lighting_condition_group == "Other Lighting Conditions"), aes(x = risk_index, fill = lighting_condition_group)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Other Lighting Conditions" = "#54350a")) +  # Custom color
+  labs(x = "Risk Index", y = "Density", title = "Other Lighting Conditions") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Display the four plots side by side
+plot_dark
+plot_dawn
+plot_daylight
+plot_other
 ```
 
-```{r}
+@fig-risk-index-lighting-conditions display the distribution of the Risk Index across various lighting conditions. The data is broken down into four main lighting categories: Low Light (Dark & Artificial), Dawn and Artificial Light, Bright Daylight and Artificial Light, and Other Lighting Conditions.
 
-```
+@fig-risk-index-lighting-conditions-1 highlights the risk distribution during low-light conditions, including both "Dark" and "Dark, Artificial" categories. The density curve shows that motorbike risks are relatively higher in these conditions, particularly in the moderate-to-high range of the Risk Index, indicating that poorer visibility and the presence of artificial lighting increase the likelihood of incidents.
+
+@fig-risk-index-lighting-conditions-2 captures the risk profile during dawn and artificial lighting. The distribution shifts slightly, showing a lower concentration of higher risk indices compared to the low-light category. While there is still some risk during dawn, the overall risk index appears to be less extreme compared to the "Low Light" category, possibly due to the improving visibility as the sun rises.
+
+@fig-risk-index-lighting-conditions-3 shows a much lower density of high-risk events. This suggests that the highest risk does not generally occur during daylight hours, as visibility is much better, and traffic conditions tend to be more predictable.
+
+@fig-risk-index-lighting-conditions-4 captures a small number of cases that don’t fit into the above categories. The risk distribution in this category is less pronounced, likely because it includes a variety of edge cases, such as unusual lighting conditions or missing data.
+
 
 ## Mapping the Risk: Neighborhood-Level Insights
 
-Spatial Patterns in the Distribution of the Risk Index
-
-Plot Ideas:
-Choropleth Map: Display the Risk Index across neighborhoods with color gradients indicating risk levels.
-
-Bar Chart: Rank neighborhoods by their average Risk Index to identify the most vulnerable areas.
+### Neighborhood Risk Distribution
 
 ```{r}
+#| label: fig-his_collosion_risk
+#| fig-cap: "Neighborhoods grouped by average collision probabilities into High, Medium, and Low risk categories."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 7
+#| fig-height: 3.5
+#| 
+
+# Load necessary libraries
+library(tidyverse)
+library(hrbrthemes)
+
+# Load the dataset
+data <- read.csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
+
+# Take the average for duplicate neighborhoods
+data <- data %>%
+  group_by(hood_158) %>%
+  summarise(collision_probability = mean(collision_probability, na.rm = TRUE)) %>%
+  ungroup()
+
+# Create groups: High, Medium, Low
+data <- data %>%
+  mutate(
+    risk_group = case_when(
+      collision_probability >= 0.8 ~ "High",
+      collision_probability >= 0.6 ~ "Medium",
+      TRUE ~ "Low"
+    )
+  )
+
+# Adjusted theme to avoid font issues
+ggplot(data, aes(x = collision_probability, color = risk_group, fill = risk_group)) +
+  geom_histogram(alpha = 0.8, binwidth = 0.05) +
+  scale_fill_manual(values = c("High" = "#54350a", "Medium" = "#2e3f78", "Low" = "#d1b33d")) +
+  scale_color_manual(values = c("High" = "#54350a", "Medium" = "#2e3f78", "Low" = "#d1b33d")) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    panel.spacing = unit(0.1, "lines"),
+    strip.text.x = element_text(size = 8)
+  ) +
+  xlab("Collision Probability") +
+  ylab("Number of Neighborhoods") +
+  labs(
+    fill = "Risk Group",
+    color = "Risk Group"
+  ) +
+  facet_wrap(~risk_group)
+
 
 ```
 
+@fig-his_collosion_risk illustrates the distribution of neighborhoods in Toronto grouped by their average collision probabilities into three risk categories: High, Medium, and Low. Each panel represents one of the risk categories and shows the range of collision probabilities (x-axis) and the corresponding number of neighborhoods (y-axis) in that category. For example, the High-risk group predominantly consists of neighborhoods with collision probabilities between 0.8 and 1.0, indicating a clustering of high probabilities in these areas. The Medium-risk group primarily includes neighborhoods with probabilities between 0.6 and 0.8, while the Low-risk group has neighborhoods with probabilities below 0.6.
+
+This visualization aligns with the study's focus on spatial patterns, as it highlights that collision risks are not evenly distributed across neighborhoods. The results suggest targeted interventions could be more effective when tailored to the risk level of specific areas, such as road safety measures in neighborhoods with high collision probabilities.
+
+### Maps
+
 ```{r}
+#| label: fig-collision_map
+#| fig-cap: "Neighborhood Collision Points in Toronto Highlighting High Collision Risk Areas"
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 5
+
+# Load necessary libraries
+library(sf)
+library(ggplot2)
+library(osmdata)
+library(dplyr)
+
+# Load the GeoJSON file
+collision_data <- st_read(here("data", "02-analysis_data", "collision.geojson"), quiet = TRUE)
+
+
+# Add a column to classify top 15 neighborhoods
+top_15_hoods <- c(173, 88, 29, 61, 89, 84, 153, 53, 79, 157, 150, 12, 108, 143, 98)
+collision_data <- collision_data %>%
+  mutate(
+  is_top_15 = ifelse(as.numeric(HOOD_158) %in% top_15_hoods, "High Collision Risk Neighborhoods", "Others")
+)
+
+# Get a basemap of Toronto from OpenStreetMap
+toronto_bbox <- c(-79.6393, 43.5810, -79.1151, 43.8555)  # Toronto bounding box
+toronto_map <- opq(bbox = toronto_bbox) %>%
+  add_osm_feature(key = "landuse") %>%
+  osmdata_sf()
+
+# Verify CRS and transform if needed
+collision_data <- st_transform(collision_data, crs = 4326)
+
+# Update basemap query
+toronto_map <- opq(bbox = toronto_bbox) %>%
+  add_osm_feature(key = "landuse", value = "residential") %>%
+  osmdata_sf()
+
+# Create the plot
+ggplot() +
+  # Add basemap
+  geom_sf(data = toronto_map$osm_polygons, fill = "gray90", color = "gray70") +
+  # Add collision points with classification
+  geom_sf(data = collision_data, aes(color = is_top_15), size = 0.5, alpha = 0.6) +
+  scale_color_manual(values = c("High Collision Risk Neighborhoods" = "red", "Others" = "yellow")) +
+  labs(
+    x = "Longitude",
+    y = "Latitude",
+    color = "Neighborhood Type",
+    title = "Neighborhood Collision Points in Toronto"
+  ) +
+  theme_minimal()
 
 ```
+ 
+@fig-collision_map illustrates the distribution of collision points across Toronto, emphasizing neighborhoods categorized as "High Collision Risk" in red and other areas in yellow. The spatial extent spans latitudes from approximately 43.55°N to 43.85°N and longitudes from -79.6°W to -79.1°W, covering most of Toronto's urban landscape.
+
+The high collision risk neighborhoods are clustered primarily in specific areas, as denoted by the red points. These regions often correspond to densely populated or high-traffic zones, where the likelihood of traffic collisions is significantly elevated. In contrast, the yellow points represent areas with lower collision risks, which are more dispersed across the map, particularly in less congested parts of the city.
+
+This map provides a critical spatial perspective, highlighting the geographic disparities in traffic collision risks within Toronto. It underscores the need for targeted safety interventions, such as traffic calming measures and enhanced infrastructure, in the high-risk neighborhoods. The visualization also serves as a tool for urban planners and policymakers to identify and prioritize areas where safety improvements could significantly reduce the frequency and severity of traffic collisions, fostering a safer urban environment.
 
 # Discussion {#sec-discussion}
-
 
 ## Temporal Risk Patterns and Behavioral Recommendations
 
 Focus: This section can interpret the temporal trends in the Risk Index and their implications for motorbike owners and policymakers. For instance, if risks peak at certain hours or days, actionable recommendations can be made for owners to avoid high-risk times or take precautions.
 
-Key Points:
-Discuss high-risk times of day or days of the week for both theft and collisions.
-Recommendations for motorbike owners to reduce risk exposure, such as avoiding specific time periods or enhancing security measures during peak theft hours.
-Potential scheduling adjustments for law enforcement patrols to align with high-risk periods..
+Key Points: Discuss high-risk times of day or days of the week for both theft and collisions. Recommendations for motorbike owners to reduce risk exposure, such as avoiding specific time periods or enhancing security measures during peak theft hours. Potential scheduling adjustments for law enforcement patrols to align with high-risk periods..
 
 ## Environmental and Situational Influences on Risk
 
 Focus: This section can examine how road, lighting, and traffic conditions contribute to the Risk Index, linking these findings to actionable changes in infrastructure or urban planning.
 
-Key Points:
-Discuss the significant environmental predictors of risk, such as poor road surface conditions or inadequate lighting.
-Recommend urban planning measures, such as improved road maintenance or installation of streetlights, to mitigate risks.
-Highlight how different environmental factors interact to amplify risks, suggesting multi-faceted approaches to improve safety.
+Key Points: Discuss the significant environmental predictors of risk, such as poor road surface conditions or inadequate lighting. Recommend urban planning measures, such as improved road maintenance or installation of streetlights, to mitigate risks. Highlight how different environmental factors interact to amplify risks, suggesting multi-faceted approaches to improve safety.
 
 ## Policy Implications of Spatial Risk Disparities
 
 Focus: This section can discuss the significant disparities in the Risk Index across neighborhoods. Highlight how certain areas are disproportionately affected by theft or collisions and the potential socioeconomic or infrastructure factors contributing to these risks.
 
-Key Points:
-Prioritizing high-risk neighborhoods for targeted interventions, such as improved street lighting or traffic control measures.
-Suggestions for law enforcement strategies to reduce theft in hotspots.
-Need for localized awareness campaigns in high-risk areas.
+Key Points: Prioritizing high-risk neighborhoods for targeted interventions, such as improved street lighting or traffic control measures. Suggestions for law enforcement strategies to reduce theft in hotspots. Need for localized awareness campaigns in high-risk areas.
 
 ## Limitations
 
-
-
 ## Future Research
-
 
 Future Work1: Explore how temporal risk patterns change with seasons or special events (e.g., holidays, festivals) to refine recommendations further.
 
 Future Work2: Develop predictive models integrating weather or real-time traffic data to dynamically assess and communicate motorbike risks.
 
-Future Work3: Investigate the correlation between neighborhood-level Risk Index values and broader social or economic indicators, such as income levels or population density.
-\newpage
+Future Work3: Investigate the correlation between neighborhood-level Risk Index values and broader social or economic indicators, such as income levels or population density. \newpage
 
 \appendix
 
-# Appendix {-}
+# Appendix {.unnumbered}
 
 # Additional Data Details {#sec-data_details}
 
@@ -761,64 +1254,51 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 
 This survey aims to assess factors contributing to motorbike risks, including theft and collisions, by gathering data from motorbike owners and riders. The survey will explore demographic characteristics, riding behavior, motorbike usage patterns, and perceptions of environmental and situational risks.
 
-
-## Sampling Approach 
+## Sampling Approach
 
 The survey will use a stratified random sampling method to ensure diverse representation across:
 
-- Geographic regions (urban, suburban, rural areas).
-- Demographic groups (age, gender, income, and education levels).
-- Riding experience (novices, intermediate, and experienced riders).
+-   Geographic regions (urban, suburban, rural areas).
+-   Demographic groups (age, gender, income, and education levels).
+-   Riding experience (novices, intermediate, and experienced riders).
 
 The target population includes licensed motorbike riders and owners. A sample size of approximately 1,000 respondents is proposed to ensure statistical validity across strata.
-
-
 
 ## Survey structure
 
 The survey will consist of five main sections:
 
-- Demographics: Basic information on respondents (e.g., age, gender, income, education, geographic location).
+-   Demographics: Basic information on respondents (e.g., age, gender, income, education, geographic location).
 
-- Riding Behavior: Frequency, duration, and purpose of motorbike usage.
+-   Riding Behavior: Frequency, duration, and purpose of motorbike usage.
 
-- Risk Awareness and Perception: Personal experiences with collisions or theft and perceptions of environmental risks.
+-   Risk Awareness and Perception: Personal experiences with collisions or theft and perceptions of environmental risks.
 
-- Situational Factors: Details of riding conditions such as time of day, weather, road surface, and lighting.
+-   Situational Factors: Details of riding conditions such as time of day, weather, road surface, and lighting.
 
-- Preventive Measures: Actions taken by riders to mitigate theft or collision risks (e.g., use of locks, helmets, or avoiding high-risk areas).
+-   Preventive Measures: Actions taken by riders to mitigate theft or collision risks (e.g., use of locks, helmets, or avoiding high-risk areas).
 
 ### Question Types
 
-- Closed-ended questions: For quantitative data (e.g., multiple choice, Likert scales, ranking).
+-   Closed-ended questions: For quantitative data (e.g., multiple choice, Likert scales, ranking).
 
-- Open-ended questions: To capture nuanced insights and personal experiences.
+-   Open-ended questions: To capture nuanced insights and personal experiences.
 
-- Matrix questions: To evaluate attitudes across multiple dimensions efficiently.
+-   Matrix questions: To evaluate attitudes across multiple dimensions efficiently.
 
 ### Question List
 
 Here are examples of survey questions:
 
-Demographics:
-What is your age group? (e.g., 18–24, 25–34, etc.)
-What is your highest level of education completed?
+Demographics: What is your age group? (e.g., 18–24, 25–34, etc.) What is your highest level of education completed?
 
-Riding Behavior:
-How often do you ride your motorbike? (Daily, Weekly, Monthly, Rarely)
-For what purposes do you primarily use your motorbike? (Commuting, Recreation, Delivery/Work, Other)
+Riding Behavior: How often do you ride your motorbike? (Daily, Weekly, Monthly, Rarely) For what purposes do you primarily use your motorbike? (Commuting, Recreation, Delivery/Work, Other)
 
-Risk Awareness and Perception:
-On a scale of 1–5, how would you rate the theft risk in your neighborhood?
-Have you experienced a motorbike theft or collision in the past year? (Yes/No)
+Risk Awareness and Perception: On a scale of 1–5, how would you rate the theft risk in your neighborhood? Have you experienced a motorbike theft or collision in the past year? (Yes/No)
 
-Situational Factors:
-What time of day do you usually ride? (Morning, Afternoon, Evening, Night)
-In what weather conditions do you typically ride? (Clear, Rainy, Snowy)
+Situational Factors: What time of day do you usually ride? (Morning, Afternoon, Evening, Night) In what weather conditions do you typically ride? (Clear, Rainy, Snowy)
 
-Preventive Measures:
-What measures do you take to secure your motorbike against theft? (Select all that apply: Lock, Alarm, GPS Tracker, Parking in Secure Locations)
-Do you avoid specific times or areas due to perceived collision risks? (Yes/No)
+Preventive Measures: What measures do you take to secure your motorbike against theft? (Select all that apply: Lock, Alarm, GPS Tracker, Parking in Secure Locations) Do you avoid specific times or areas due to perceived collision risks? (Yes/No)
 
 ## Recruitment Strategy
 
@@ -832,8 +1312,6 @@ Offline channels: Flyers at motorbike dealerships, repair shops, and riding scho
 
 The survey design is informed by prior studies on motor vehicle risk perception, road safety, and crime prevention. Key references include:
 
-Research on environmental and situational predictors of road accidents.
-Studies on the effectiveness of theft prevention measures.
-Literature on sampling methods and survey design for risk assessment.
+Research on environmental and situational predictors of road accidents. Studies on the effectiveness of theft prevention measures. Literature on sampling methods and survey design for risk assessment.
 
 # References
