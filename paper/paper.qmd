@@ -330,7 +330,7 @@ The structure of the paper is organized as follows: following @sec-intro, @sec-d
 
 # Data {#sec-data}
 
-This project is motivated and guided by Rohan Alexander and his book [@tellingstories]. Data used in this paper was cleaned, analyzed and modeled with the programming language R [@citeR]. Also with support of additional packages in R: `readr` [@citeReadr], `ggplot2` [@citeGgplot2], `tidyverse` [@citeTidyverse], `dplyr` [@citeDplyr], `here` [@citeHere], `knitr` [@citeKnitr], `kableExtra` [@citeKableExtra], `palmerpenguins` [@citePalmerpenguins], `performance` [@citePerformance], `tidygraph` [@citeTidygraph], `ggraph` [@citeGgraph], `lubridate` [@citeLubridate], `sf` [@citeSf], `osmdata` [@citeOsmdata], `car` [@citeCar],
+This project is motivated and guided by Rohan Alexander and his book [@citeTbook]. Data used in this paper was cleaned, analyzed and modeled with the programming language R [@citeR]. Also with support of additional packages in R: `readr` [@citeReadr], `ggplot2` [@citeGgplot2], `tidyverse` [@citeTidyverse], `dplyr` [@citeDplyr], `here` [@citeHere], `knitr` [@citeKnitr], `kableExtra` [@citeKableExtra], `palmerpenguins` [@citePalmerpenguins], `performance` [@citePerformance], `tidygraph` [@citeTidygraph], `ggraph` [@citeGgraph], `ggridges` [@ggridges], `lubridate` [@citeLubridate], `sf` [@citeSf], `osmdata` [@citeOsmdata], and `car` [@citeCar].
 
 Details about the data cleaning process and the criteria for variable selection are provided in [Appendix -@sec-data_details].
 
@@ -351,7 +351,7 @@ The datasets from Open Data Toronto did not specify the exact methods used for d
 
 Some coordinate information in the datasets appears as “0, 0,” indicating that the specific location was either not validated or could not be geocoded. In such cases, a general division or neighborhood association may still be provided, but for invalid or external locations, the designation “NSA” (“Not Specified Area”) is used. Furthermore, the Toronto Police Service does not guarantee the accuracy, completeness, or timeliness of the data, which may lead to potential misinterpretations or incomplete analyses.
 
-Additional details about the dataset are available in the datasheet, accessible through the repository linked to this paper.
+Additional details about the dataset are available in the [datasheet](https://github.com/ohyykk/Toronto_Motor_Viehicle/blob/main/other/datasheet/Toronto_Motor_Risk_datasheet.pdf), accessible through the repository linked to this paper.
 
 ## Outcome Variables
 
@@ -393,53 +393,53 @@ The skewness and spread of the distribution highlight the variability in the com
 
 
 ```{r}
-#| label: fig-risk-index-boxplot
+#| label: fig-risk-index-ridge
 #| echo: false
 #| warning: false
 #| message: false
 #| fig-cap: "Risk Index Distribution by Risk Category"
 #| fig-pos: H
 #| fig-width: 8 
-#| fig-height: 4 
+#| fig-height: 3.5 
 
+# Load necessary libraries
+library(ggridges)
 library(ggplot2)
-library(dplyr)
+library(here)
+library(readr)
+library(dplyr)  # For data manipulation
 
+# Load the data
 risk_index_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
 
-# Assume `risk_index_data` contains the `risk_index` values for each neighborhood
-# Group neighborhoods by average Risk Index
-grouped_data <- risk_index_data %>%
-  group_by(hood_158) %>%
-  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE)) %>%
-  mutate(risk_category = case_when(
-    avg_risk_index <= quantile(avg_risk_index, 0.25) ~ "Low Risk",
-    avg_risk_index > quantile(avg_risk_index, 0.25) & avg_risk_index <= quantile(avg_risk_index, 0.75) ~ "Moderate Risk",
-    avg_risk_index > quantile(avg_risk_index, 0.75) ~ "High Risk"
-  ))
-
-# Add risk categories directly to the `risk_index_data`
+# Create risk_category based on risk_index
 risk_index_data <- risk_index_data %>%
-  left_join(grouped_data %>% select(hood_158, risk_category), by = "hood_158")
+  mutate(
+    risk_category = case_when(
+      risk_index < 0.33 ~ "Low Risk",
+      risk_index < 0.66 ~ "Moderate Risk",
+      TRUE ~ "High Risk"
+    )
+  )
 
-# Box plot of Risk Index by Risk Category with custom colors
-ggplot(risk_index_data, aes(x = risk_category, y = risk_index, fill = risk_category)) +
-  geom_boxplot(outlier.color = "darkred", outlier.shape = 16, alpha = 0.7) +
+# Ridge plot of Risk Index by Risk Category
+ggplot(risk_index_data, aes(x = risk_index, y = risk_category, fill = risk_category)) +
+  geom_density_ridges(alpha = 0.7, color = "black") +
   scale_fill_manual(
     values = c("Low Risk" = "#603601", "Moderate Risk" = "#3a6a91", "High Risk" = "#cfb886")
   ) +
   labs(
-    x = "Risk Category",
-    y = "Risk Index"
+    x = "Risk Index",
+    y = "Risk Category"
   ) +
   theme_minimal() +
   theme(legend.position = "none")
 
 ```
 
-Building on the distribution of the Risk Index in @fig-risk-index-histogram, @fig-risk-index-boxplot highlights the distribution of the Risk Index across three defined categories: High Risk, Low Risk and Moderate Risk. Each category represents a grouping of neighborhoods based on their average Risk Index values. The plot illustrates distinct differences in the distribution of the Risk Index between these categories.
+Building on the distribution of the Risk Index in @fig-risk-index-ridge highlights the density of the Risk Index across three defined categories: High Risk, Moderate Risk, and Low Risk. Each category represents a grouping of neighborhoods based on their average Risk Index values. The plot illustrates distinct patterns in the distribution of the Risk Index between these categories.
 
-The High Risk category illustrates a higher median Risk Index, with a relatively narrow interquartile range (IQR), indicating consistent high-risk values across neighborhoods in this group. Conversely, the Low Risk category has a significantly lower median, with a similarly narrow IQR, suggesting stable low-risk conditions in these neighborhoods. The Moderate Risk category shows greater variability in its distribution, with a wider IQR and overlapping values with both High Risk and Low Risk categories. This suggests that neighborhoods in the Moderate Risk group exhibit diverse risk profiles, likely influenced by varying environmental and situational factors.
+The High Risk category demonstrates a single, narrow peak at relatively higher Risk Index values, indicating a concentrated group of neighborhoods with consistently elevated risk levels. This density suggests a homogeneity in the high-risk group, where most neighborhoods share similar risk characteristics. Conversely, the Low Risk category shows a bimodal distribution, with two distinct peaks at much lower Risk Index values. This indicates variability within this category, with some neighborhoods experiencing very low risk and others clustering near the moderate range. The Moderate Risk category displays a more diffuse distribution, with a broad range of Risk Index values extending into both the High Risk and Low Risk ranges. This variability suggests that neighborhoods in the Moderate Risk category experience diverse risk profiles, likely shaped by a combination of environmental, temporal, and situational factors.
 
 ## Predictor Variables
 
@@ -793,7 +793,7 @@ Factors influencing these patterns may include reduced visibility during nightti
 
 ```{r}
 #| label: tbl-time_of_day_summary
-#| tbl-cap: "5 Examples of Different Times of Day with Incident Count"
+#| tbl-cap: "Examples of Different Times of Day with Incident Count"
 #| echo: false
 #| warning: false
 #| message: false
@@ -1046,7 +1046,7 @@ ggplot(collision_data, aes(x = time_of_day, y = logit)) +
 
 ```
 
-Figure @fig-linear-time-of-day illustrates the relationship between variable Time of Day and the predicted values of the collision probability model. The horizontal axis represents the reported time of day in minutes since midnight, while the vertical axis displays the logit values. Gray points depict the raw data, and the blue smoothed line represents the average trend. To evaluate the linearity assumption, the smoothed line is compared to a hypothetical linear relationship. Significant deviations of the smoothed line from a straight line may suggest a potential violation of the linearity assumption.
+@fig-linear-time-of-day illustrates the relationship between variable Time of Day and the predicted values of the collision probability model. The horizontal axis represents the reported time of day in minutes since midnight, while the vertical axis displays the logit values. Gray points depict the raw data, and the blue smoothed line represents the average trend. To evaluate the linearity assumption, the smoothed line is compared to a hypothetical linear relationship. Significant deviations of the smoothed line from a straight line may suggest a potential violation of the linearity assumption.
 
 In this plot, the smoothed line shows a relatively stable trend with minimal deviations, indicating no substantial evidence against the linearity assumption. Local fluctuations are minor and likely reflect natural variations in the data rather than a systematic departure from linearity.
 
@@ -1093,7 +1093,7 @@ vif_table
 
 ```
 
-The results of the VIF analysis for the collision risk model are presented in Table @tbl-vif. Most predictors exhibit VIF values well below the commonly used threshold of 5, indicating no significant multicollinearity among them. However, two predictors, Visibility Conditions and Road conditions, show slightly elevated VIF values of 7.29 and 7.51, respectively. While these values are higher than the others, they remain below the severe multicollinearity threshold of 10, suggesting that multicollinearity, though present to some extent, is not critical.
+The results of the VIF analysis for the collision risk model are presented in @tbl-vif. Most predictors exhibit VIF values well below the commonly used threshold of 5, indicating no significant multicollinearity among them. However, two predictors, Visibility Conditions and Road conditions, show slightly elevated VIF values of 7.29 and 7.51, respectively. While these values are higher than the others, they remain below the severe multicollinearity threshold of 10, suggesting that multicollinearity, though present to some extent, is not critical.
 
 The slightly elevated VIF values can be attributed to a potential overlap in the information captured by Visibility Conditions and Road Conditions. For instance, poor visibility often coincides with adverse road conditions, such as wet or icy surfaces, leading to some degree of correlation between these variables.
 
