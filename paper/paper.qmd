@@ -318,7 +318,7 @@ saveRDS(final_risk_model, rds_output_path)
 
 # Introduction {#sec-intro}
 
-Decisions surrounding motorbike ownership and usage carry significant implications for personal safety and financial liability. Recent statistics highlight the increased risks associated with owning and riding motorbikes, including a heightened likelihood of theft and collisions compared to other vehicles [@Yasmin2016]. These risks are influenced by various factors such as geographic location, road conditions, time of day, and type of motorbike, making it essential to develop tools that effectively assess and mitigate these dangers.\[can add one more sentence + citations\]
+Decisions surrounding motorbike ownership and usage carry significant implications for personal safety and financial liability. Recent statistics highlight the increased risks associated with owning and riding motorbikes, including a heightened likelihood of theft and collisions compared to other vehicles [@Yasmin2016]. These risks are influenced by various factors such as geographic location, road conditions, time of day, and type of motorbike, making it essential to develop tools that effectively assess and mitigate these dangers. Furthermore, studies have shown that socioeconomic conditions and local enforcement of traffic laws significantly influence the incidence of motor theft and collisions, highlighting the need for multi-faceted strategies to address these risks [@charron2009neighbourhood; @law2024monitoring].
 
 This study introduces a composite risk score model to assess the risks associated with owning and riding a motorbike. Using data from Open Data Toronto, the model evaluates two critical events: motorbike theft and collisions. Logistic regression is employed to estimate the probabilities of motor collisions, and a theft index is calculated which are then combined with the likelihood of motor collisions into a single, interpretable composite risk score. This metric is designed to guide motorbike users, insurers, and policymakers in risk assessment and decision-making, while informing strategies to mitigate these risks.
 
@@ -538,13 +538,14 @@ ggplot(hour_summary, aes(x = hour, y = theft_count)) +
 #### Day of the Week
 
 The **Day of the Week** variable is included as a predictor to analyze weekly trends in motorbike theft incidents. @fig-plot-day_summary visualizes the distribution of thefts across the week, revealing that incidents tend to peak on Monday and Tuesday, with slightly lower occurrences on weekends, particularly Saturday and Sunday. This predictor captures potential variations tied to weekly routines, such as higher theft risks during the start of the workweek when urban activity is higher, or reduced risks over the weekend when monitoring or exposure may change. By incorporating this variable, the model can better account for these temporal patterns, enhancing its ability to predict theft incidents based on the day of the week.
+\newpage 
 
 ```{r}
 #| label: fig-plot-day_summary
 #| fig-cap: "Theft Incidents by Day of the Week"
 #| echo: false
 #| fig-width: 8
-#| fig-height: 3.5
+#| fig-height: 3
 #| warning: false
 #| message: false
 
@@ -581,7 +582,7 @@ The **Premises Type** variable is included as a predictor to examine the context
 #| fig-cap: "Theft Incidents by Day of the Week"
 #| echo: false
 #| fig-width: 8
-#| fig-height: 3.5
+#| fig-height: 3
 #| warning: false
 #| message: false
 
@@ -617,7 +618,7 @@ The **Neighborhood ID** variable serves as a categorical predictor, uniquely ide
 
 ```{r}
 #| label: tbl-neighborhood_summary
-#| fig-cap: "10 Examples of Neighborhood Incidents Count"
+#| tbl-cap: "10 Examples of Neighborhood Incidents Count"
 #| echo: false
 #| warning: false
 #| message: false
@@ -701,6 +702,8 @@ The **Lighting Condition** variable is a categorical predictor that describes th
 
 @fig-lighting_summary illustrates that the majority of incidents occur during daylight hours, likely due to higher traffic volumes and activity levels during the day. Incidents under "Dark" and "Dark, artificial" conditions are less frequent but still significant, highlighting the increased risks associated with poor visibility. Transitional conditions like "Dawn" and "Dusk" contribute minimally to the total number of incidents. These findings emphasize the need for targeted safety measures, such as enhancing artificial lighting and promoting driver vigilance in low-visibility conditions, to reduce collision risks effectively.
 
+\newpage 
+
 ```{r}
 #| label: fig-lighting_summary
 #| fig-cap: "Incidents by Lighting Conditionk"
@@ -748,7 +751,7 @@ As shown in @tbl-traffic_control_summary, the majority of incidents occur in are
 
 ```{r}
 #| label: tbl-traffic_control_summary
-#| fig-cap: "Summary of Traffic Control"
+#| tbl-cap: "Summary of Traffic Control"
 #| echo: false
 #| warning: false
 #| message: false
@@ -790,7 +793,7 @@ Factors influencing these patterns may include reduced visibility during nightti
 
 ```{r}
 #| label: tbl-time_of_day_summary
-#| fig-cap: "5 Examples of Different Times of Day with Incident Count"
+#| tbl-cap: "5 Examples of Different Times of Day with Incident Count"
 #| echo: false
 #| warning: false
 #| message: false
@@ -879,11 +882,11 @@ Detailed model diagnostics, variable descriptions, and performance metrics are i
 
 To capture theft risk without relying on logistic regression due to the absence of negative (non-theft) cases, we calculated sub-indexes for three critical factors:
 
--Hour of the Day: Risk distribution across 24 hours, normalized so the sum equals 1/3.
+- **Hour of the Day**: Risk distribution across 24 hours, normalized so the sum equals 1/3.
 
--Day of the Week: Risk distribution across 7 days, normalized so the sum equals 1/3.
+- **Day of the Week**: Risk distribution across 7 days, normalized so the sum equals 1/3.
 
--Premises Type: Risk distribution across premises types (House, Outside, Commercial), normalized so the sum equals 1/3.
+- **Premises Type**: Risk distribution across premises types (House, Outside, Commercial), normalized so the sum equals 1/3.
 
 The total theft component is calculated as: \begin{align*}
 C_{\text{Theft}} &= \text{Hour Index} + \text{Day Index} + \text{Premises Type Index}
@@ -903,12 +906,12 @@ A logistic regression model was used to predict the likelihood of severe collisi
 ```
 The model prediction utilizes the following predictor variables:
 
--   Neighborhood ID (`hood_158`): Unique identifier for the neighborhood.
--   Road Surface Condition (`road_conditions`): Conditions such as dry, wet, or icy.
--   Lighting Condition (`lighting_conditions`): Visibility levels, such as daylight or artificial light.
--   Traffic Control (`traffic_control`): Presence of traffic management devices (e.g., stop signs, signals).
--   Road Visibility (`visibility_conditions`): Road visibility conditions, such as clear, snow or rain
--   Time of Day (`time`): Time where collision occured in Toronto
+-   **Neighborhood ID** (`hood_158`): Unique identifier for the neighborhood.
+-   **Road Surface Condition** (`road_conditions`): Conditions such as dry, wet, or icy.
+-   **Lighting Condition** (`lighting_conditions`): Visibility levels, such as daylight or artificial light.
+-   **Traffic Control** (`traffic_control`): Presence of traffic management devices (e.g., stop signs, signals).
+-   **Road Visibility** (`visibility_conditions`): Road visibility conditions, such as clear, snow or rain
+-   **Time of Day** (`time`): Time where collision occured in Toronto
 
 The model assigns coefficients as follows:
 
@@ -949,7 +952,9 @@ The theft sub-index approach is based on two key assumptions. First, it assumes 
 
 ### Composite Risk Index
 
-For the assumption of the composite risk index, it is assumed that the weights assigned to the collision probability and theft component reflect their relative importance in contributing to the overall risk, based on the severity and frequency of these events in real-world scenarios. The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components:
+For the assumption of the composite risk index, it is assumed that the weights assigned to the collision probability and theft component reflect their relative importance in contributing to the overall risk, based on the severity and frequency of these events in real-world scenarios. The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. 
+
+Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components:
 
 $$
 w_1 \text{ and } w_2
@@ -1416,6 +1421,8 @@ ggplot(violin_data, aes(x = road_conditions, y = risk_index, fill = road_conditi
 ```
 
 @fig-risk-distribution-roadcondition reveals notable differences in the Risk Index distribution across various road surface conditions. Wet and icy conditions, in particular, show higher variability in the Risk Index, suggesting that these surfaces may lead to more unpredictable and elevated risk levels. Dry conditions, on the other hand, generally exhibit a lower and more consistent risk. These findings highlight the significant impact that road surface conditions can have on traffic-related risks, underscoring the importance of considering these factors in risk management and safety measures.
+\newpage
+
 
 ```{r}
 #| label: fig-risk-index-lighting-conditions
@@ -1566,7 +1573,7 @@ ggplot(data, aes(x = collision_probability, color = risk_group, fill = risk_grou
 #| warning: false
 #| message: false
 #| fig-width: 10
-#| fig-height: 6
+#| fig-height: 5.5
 
 # Load necessary libraries
 library(sf)
@@ -1700,7 +1707,134 @@ Qualitative research with residents and stakeholders in high-risk neighborhoods 
 
 # Additional Data Details {#sec-data_details}
 
-## Data Cleaning
+## Cleaning Methods
+
+The goal of the data cleaning process was to import raw theft and collision data, and refine the necessary columns to prepare cleaned datasets for analysis. The process began with loading two CSV files: "Motor Vehicle Collisions with KSI Data.csv" and "theft-from-motor-vehicle.csv", which contained information about products and their associated transactions. Examples of raw data are illustrated in @tbl-raw_data_1 and @tbl-raw_data_2.
+
+```{r}
+#| label: tbl-raw_data_1
+#| tbl-cap: "Examples of raw collision data"
+#| echo: false
+
+# Load necessary libraries
+library(tidyverse)
+library(kableExtra)
+
+# Create the example data
+mvc_example <- tibble(
+  Variable = c(
+    "_id", "ACCNUM", "DATE", "TIME", "STREET1", "STREET2", "OFFSET", "ROAD_CLASS",
+    "DISTRICT", "ACCLOC", "TRAFFCTL", "VISIBILITY", "LIGHT", "RDSFCOND", 
+    "ACCLASS", "IMPACTYPE", "INVTYPE", "INVAGE", "INJURY", "FATAL_NO", 
+    "INITDIR", "VEHTYPE", "MANOEUVER", "DRIVACT", "DRIVCOND", "PEDTYPE", 
+    "PEDACT", "PEDCOND", "CYCLISTYPE", "CYCACT", "CYCCOND", "PEDESTRIAN", 
+    "CYCLIST", "AUTOMOBILE", "MOTORCYCLE", "TRUCK", "TRSN_CITY_VEH", 
+    "EMERG_VEH", "PASSENGER", "SPEEDING", "AG_DRIV", "REDLIGHT", "ALCOHOL", 
+    "DISABILITY", "HOOD_158", "NEIGHBOURHOOD_158", "HOOD_140", 
+    "NEIGHBOURHOOD_140", "DIVISION", "geometry"
+  ),
+  Example = c(
+    "1", "893184", "2006-01-01", "236", "WOODBINE AVE", "O CONNOR DR", "None", 
+    "Major Arterial", "Toronto and East York", "Intersection Related", 
+    "No Control", "Clear", "Dark", "Wet", "Non-Fatal Injury", "Approaching", 
+    "Passenger", "50 to 54", "Major", "None", "None", "None", "None", "None", 
+    "None", "None", "None", "None", "None", "None", "None", "None", "Yes", 
+    "None", "None", "None", "None", "Yes", "Yes", "Yes", "None", "Yes", "None", 
+    "60", "Woodbine-Lumsden", "60", "Woodbine-Lumsden (60)", "D55", 
+    '{"type": "MultiPoint", "coordinates": [[-79.318797000266, 43.6995950001932]]}', 
+    "N/A"  # Added the missing value
+  )
+)
+
+# Render the table vertically
+mvc_example %>%
+  kable(
+    col.names = c("Variable Name", "Example Value"),
+    align = "l",
+    caption = "Table 1: Example Data from Motor Vehicle Collisions Dataset"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE
+  )
+
+
+```
+
+```{r}
+#| label: tbl-raw_data_2
+#| tbl-cap: "Examples of raw theft data"
+#| echo: false
+
+# Load necessary libraries
+library(tidyverse)
+library(kableExtra)
+
+# Create the example data
+example_data <- tibble(
+  Variable = c(
+    "_id", "EVENT_UNIQUE_ID", "REPORT_DATE", "OCC_DATE", "REPORT_YEAR", 
+    "REPORT_MONTH", "REPORT_DAY", "REPORT_DOY", "REPORT_DOW", "REPORT_HOUR", 
+    "OCC_YEAR", "OCC_MONTH", "OCC_DAY", "OCC_DOY", "OCC_DOW", "OCC_HOUR", 
+    "DIVISION", "LOCATION_TYPE", "PREMISES_TYPE", "UCR_CODE", "UCR_EXT", 
+    "OFFENCE", "MCI_CATEGORY", "HOOD_158", "LONG_WGS84", "LAT_WGS84", "geometry"
+  ),
+  Example = c(
+    "1", "GO-20141261501", "2014-01-01", "2014-01-01", "2014", "January", "1", 
+    "1", "Wednesday", "8", "2014", "January", "1", "1", "Wednesday", "8", "D51", 
+    "Single Home, House (Attach Garage, Cottage, Mobile)", "House", "2142", 
+    "200", "Theft From Motor Vehicle Under", "NonMCI", "73", "-79.37453055088850", 
+    "43.65706729617110", '{"type": "MultiPoint", "coordinates": [[-79.374530551, 43.657067296]]}'
+  )
+)
+
+# Render the table vertically
+example_data %>%
+  kable(
+    col.names = c("Variable Name", "Example Value"),
+    align = "l",
+    caption = "Table 1: Example Data for Reported Incidents"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE
+  )
+
+```
+
+To prepare the raw collision data for analysis, a structured cleaning process was carried out with a focus on maintaining consistency and accuracy. Essential libraries were loaded at the start of the process, including `tidyverse` for data manipulation, `janitor` for standardizing column names, `here` for managing file paths, and `arrow` for saving the cleaned data in an efficient Parquet format. These tools provided a comprehensive framework for handling various cleaning tasks effectively and ensuring the dataset was ready for further use.
+
+The raw traffic data was loaded from a CSV file using `read_csv()`. An initial step involved checking for the presence of a `geometry` column, which was removed if found, as it was not relevant for the analysis. Column names were standardized using `janitor::clean_names()`, ensuring they were formatted in snake_case for consistency. Additional formatting steps replaced dots with underscores and removed non-alphanumeric characters, making the column names more usable and easier to interpret.
+
+Duplicates were removed from the dataset using the `distinct()` function, ensuring each record was unique. Missing values were handled by replacing placeholder text like `"None"` with `NA` across all character columns. This step helped standardize the handling of missing data, allowing it to be appropriately identified and excluded in subsequent analyses.
+
+Key columns were converted to appropriate data types to facilitate accurate analysis. The `invage` column, representing age, was converted to numeric, while the `injury` column was transformed into a factor to categorize injury types effectively. These type conversions ensured that the data could be analyzed and interpreted meaningfully.
+
+To improve readability and maintain consistency with other datasets, several columns were renamed. For example, `accnum` was renamed to `accident_id`, `date` to `report_date`, and `traffctl` to `traffic_control`. This renaming improved the clarity of the dataset and aligned it with conventions used in related datasets, such as the cleaned crime data.
+
+The dataset’s geographic data was validated by ensuring latitude and longitude values fell within acceptable ranges. Latitude values were checked to be between `-90` and `90`, and longitude values were validated to be between `-180` and `180`. Records with invalid geographic coordinates were excluded, ensuring the spatial data was accurate and reliable.
+
+Finally, the cleaned dataset was saved in Parquet format using `write_parquet()`. The Parquet format was chosen for its storage efficiency and compatibility with data processing tools, making it an ideal format for large datasets. Additionally, a summary of the cleaned dataset was generated using the `summary()` function, providing an overview of the dataset's structure and content.
+
+In summary, this cleaning process ensured the traffic data was free of duplicates and invalid entries, featured consistent and intuitive column names, and had validated geographic information. The resulting dataset was stored in an optimized format, making it ready for downstream analysis tasks.
+
+```{r}
+```
+
+The data cleaning process for the raw theft data show in @tbl-raw_data_2 was designed to ensure the dataset is accurate, consistent, and ready for analysis. First, the required libraries such as `tidyverse` for data manipulation, `janitor` for standardizing column names, `here` for handling file paths, and `arrow` for managing Parquet files were loaded. Additionally, a directory structure was established to store the cleaned data in a designated folder. This setup provided a solid foundation for the cleaning process.
+
+To validate the data, predefined lists of valid values for certain fields were established. Specifically, a set of valid division codes (e.g., "D51", "D42") and offense categories (e.g., "Theft From Motor Vehicle Under", "Other Theft") was created to filter out any unrecognized or irrelevant entries. This ensured that only records meeting specific criteria would be retained in the final dataset.
+
+The raw crime data was loaded from a CSV file, and column names were standardized using the `clean_names()` function from the `janitor` package. Key columns, such as `report_date` and `occ_date`, were converted into date formats, while latitude and longitude fields were cast to numeric values for validation. The `report_hour` column was converted into integers, and a new column, `report_dow`, was added to capture the day of the week from the `report_date`.
+
+Rows with missing critical values, such as `event_unique_id`, `report_date`, `division`, `offence`, or geographic coordinates, were removed to maintain data quality. Additionally, latitude and longitude values were validated to ensure they fell within acceptable ranges (latitude: -90 to 90, longitude: -180 to 180). Text fields such as `division` and `offense` were standardized by trimming extra spaces and converting values to uppercase. Records with division codes or offenses not included in the predefined valid lists were excluded from the dataset. To further ensure data integrity, duplicate rows based on `event_unique_id` were removed.
+
+The dataset was further refined by selecting only relevant columns, such as `event_unique_id`, `report_date`, `division`, `location_type`, and geographic coordinates. Columns were renamed to make them more intuitive, such as renaming `event_unique_id` to `event_id` and `report_date` to `report`. This helped to simplify and clarify the structure of the data.
+
+Finally, the cleaned dataset was saved as a Parquet file (`cleaned_crime_data.parquet`) using the `write_parquet()` function. The Parquet format was chosen for its efficiency in storage and processing, making the dataset ready for further analysis. Examples of cleaned theft data is presented in @tbl-cleaned_theft. This comprehensive cleaning process resulted in a high-quality dataset that is well-prepared for any downstream tasks.
+
+```{r}
+```
 
 # Model details {#sec-model-details}
 
