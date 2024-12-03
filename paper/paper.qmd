@@ -456,6 +456,7 @@ The predictor variables in this study are organized into two distinct models: Th
 #| fig-height: 4  # Adjusted height for spacing
 
 # Load required libraries
+
 library(tidygraph)
 library(ggraph)
 
@@ -500,19 +501,108 @@ The Theft Index focuses on the temporal and locational characteristics that infl
 
 The **Hour of the Day** variable is used as a predictor to analyze temporal trends in motorbike theft occurrences. This variable helps identify whether certain hours are associated with elevated or reduced theft risks. Contributing factors may include decreased monitoring during nighttime hours, increased activity in high-risk areas during specific times, or patterns related to commuter schedules. @plt-hour_summary outlines the distribution of theft incidents across different hours, offering insights into periods with disproportionately high or low occurrences, which could impact the understanding of temporal theft risk dynamics.
 
-[plot of distribution of theft incidents across different hours]
+```{r}
+#| label: plt-hour_summary
+#| fig-cap: "Theft Incidents by Hour of the Day"
+#| echo: false
+#| warning: false
+#| message: false
+# Load necessary libraries
+library(tidyverse)
+
+# Load the cleaned crime data
+cleaned_crime_data <- read_csv(here("data", "02-analysis_data", "cleaned_crime_data.csv"))
+
+# Summarize the number of theft incidents by hour
+hour_summary <- cleaned_crime_data %>%
+  group_by(hour) %>%
+  summarize(theft_count = n()) %>%
+  arrange(hour)
+
+# Create the plot
+ggplot(hour_summary, aes(x = hour, y = theft_count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  scale_x_continuous(breaks = 0:23, labels = sprintf("%02d", 0:23)) + # Ensure 24-hour format
+  theme_minimal() +
+  labs(
+    
+    x = "Hour of the Day (24-hour format)",
+    y = "Number of Theft Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+```
 
 #### Day of the Week
 
 The **Day of the Week** variable is included as a predictor to examine weekly patterns in motorbike theft incidents. This variable helps determine whether theft risks vary across different days of the week. Factors such as increased activity on weekends, reduced monitoring during certain weekdays, or patterns linked to routine schedules may influence these variations. @plot-day_summary summarizes the distribution of theft incidents by day of the week, highlighting any days with notably high or low occurrences. 
 
-[plot of distribution of theft incidents across day of week]
+```{r}
+#| label: plot-day_summary
+#| fig-cap: "Theft Incidents by Day of the Week"
+#| echo: false
+#| warning: false
+#| message: false
 
+# Summarize the number of theft incidents by day of the week
+day_summary <- cleaned_crime_data %>%
+  group_by(day_of_week) %>%
+  summarize(theft_count = n()) %>%
+  arrange(match(day_of_week, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
+
+# Create the plot with a different color
+ggplot(day_summary, aes(x = day_of_week, y = theft_count)) +
+  geom_bar(stat = "identity", fill = "tomato") +
+  theme_minimal() +
+  labs(
+    
+    x = "Day of the Week",
+    y = "Number of Theft Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+
+```
 #### Premises Type
 
-The **Premises Type** variable serves as a predictor to analyze the contextual settings where motorbike theft incidents occur. This variable helps identify whether certain types of premises, such as residential areas, commercial establishments, or public parking lots, are associated with higher or lower theft risks. Factors like the availability of surveillance, the density of parked motorbikes, or accessibility to offenders may contribute to variations across premises types. @tbl-premises_summary provides a breakdown of the number of theft incidents by premises type, highlighting locations with elevated or reduced risks. 
+The **Premises Type** variable serves as a predictor to analyze the contextual settings where motorbike theft incidents occur. This variable helps identify whether certain types of premises, such as residential areas, commercial establishments, or public parking lots, are associated with higher or lower theft risks. Factors like the availability of surveillance, the density of parked motorbikes, or accessibility to offenders may contribute to variations across premises types. @plt-premises_summary provides a breakdown of the number of theft incidents by premises type, highlighting locations with elevated or reduced risks. 
 
-[table counting the number of theft incident happened in different premises eg house]
+```{r}
+#| label: plt-premises_summary
+#| fig-cap: "Theft Incidents by Day of the Week"
+#| echo: false
+#| warning: false
+#| message: false
+
+# Summarize the number of theft incidents by premises type
+premises_summary <- cleaned_crime_data %>%
+  group_by(premises_type) %>%
+  summarize(theft_count = n()) %>%
+  arrange(desc(theft_count))  # Sort by the number of incidents
+
+# Create the plot for premises type
+ggplot(premises_summary, aes(x = reorder(premises_type, -theft_count), y = theft_count)) +
+  geom_bar(stat = "identity", fill = "dodgerblue") +
+  theme_minimal() +
+  labs(
+    title = "Theft Incidents by Premises Type",
+    x = "Premises Type",
+    y = "Number of Theft Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+```
 
 ### Collision Probability
 
@@ -522,27 +612,161 @@ The Collision Probability model, on the other hand, examines situational and env
 
 The **Neighborhood ID** variable is a categorical predictor that represents unique identifiers for neighborhoods in the City of Toronto. This variable captures spatial variations in motorbike theft and collision risks, enabling the analysis to identify neighborhood-specific patterns and trends. @tbl-neighborhood_summary provides a list of example Neighborhood IDs, illustrating how this variable is used to represent different areas in the dataset. This summary helps contextualize the role of neighborhoods in understanding collision risk distributions.
 
-[table of some examples of neighborhood ID]
+```{r}
+#| label: tbl-neighborhood_summary
+#| fig-cap: "10 Examples of Neighborhood Incidents Count"
+#| echo: false
+#| warning: false
+#| message: false
+
+# Load necessary libraries
+library(tidyverse)
+library(kableExtra)
+library(here)
+# Load the cleaned traffic data
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Summarize the dataset by Neighborhood ID (hood_158)
+neighborhood_summary <- cleaned_traffic_data %>%
+  group_by(hood_158) %>%
+  summarize(
+    incident_count = n()  # Count the number of incidents per neighborhood
+  ) %>%
+  arrange(desc(incident_count))  # Sort neighborhoods by the number of incidents
+
+# Select a few examples (e.g., top 5 and bottom 5 neighborhoods)
+example_neighborhoods <- neighborhood_summary %>%
+  slice(c(1:5, (n() - 4):n()))  # Top 5 and bottom 5 neighborhoods
+
+# Create the table with a frame
+example_neighborhoods %>%
+  kable(
+    col.names = c("Neighborhood ID", "Incident Count"),
+    align = "cc"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE
+  )
+
+
+```
 
 #### Road Surface Condition
 
-The **Road Surface Condition** variable is a categorical predictor that describes the state of the road at the time of an incident, such as dry, wet, ice, or loose snow. This variable helps analyze how varying surface conditions influence motorbike collision risks.  @plot-road_surface_summary illustrates the number of incidents across various road surface conditions, [offering insights into how different surface types contribute to overall risk patterns.]
+The Road Surface Condition variable is a categorical predictor that describes the state of the road at the time of an incident, including categories such as dry, wet, loose snow, slush, ice, packed snow, gravel, spilled liquid, and others. This variable helps analyze how varying surface conditions influence motorbike collision risks. @plot-road_surface_summary illustrates the number of incidents across all these road surface conditions, revealing that the majority of incidents occur on dry roads, followed by wet roads. Other surface conditions, such as snow, ice, or gravel, account for a much smaller proportion of incidents. This distribution suggests that while dry conditions are most common for collisions, likely due to higher traffic volumes, wet and less stable surfaces may pose proportionally greater risks. These insights emphasize the importance of considering all road conditions when designing targeted road safety measures, particularly during adverse weather, to mitigate collision risks effectively.
 
-[barlot displaying the count of incidents across different road surface conditions]
+
+```{r}
+#| label: plot-road_surface_summary
+#| fig-cap: "Incidents by Road Surface Condition"
+#| echo: false
+#| warning: false
+#| message: false
+
+
+# Summarize the number of incidents by road surface condition
+road_surface_summary <- cleaned_traffic_data %>%
+  group_by(road_conditions) %>%
+  summarize(incident_count = n()) %>%
+  arrange(desc(incident_count))  # Sort by number of incidents
+
+# Create the bar plot for all road surface conditions
+ggplot(road_surface_summary, aes(x = reorder(road_conditions, -incident_count), y = incident_count)) +
+  geom_bar(stat = "identity", fill = "seagreen") +
+  theme_minimal() +
+  labs(
+    title = "Incidents by Road Surface Condition",
+    x = "Road Surface Condition",
+    y = "Number of Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+
+
+```
 
 #### Lighting Condition
 
-The **Lighting Condition** variable is a categorical predictor that represents the type of lighting at the time of an incident, including conditions such as daylight, darkness, artificial lighting, or dawn. This variable is crucial for assessing how visibility levels and lighting environments influence the likelihood of motorbike thefts and collisions. Low visibility conditions, such as darkness or poor artificial lighting, are often linked to increased risks. @plt-lighting_summary shows the number of collision incident occurs for each lighting condition, where [xxx] has a highest...
+The Lighting Condition variable is a categorical predictor that represents the type of lighting at the time of an incident, including conditions such as daylight, darkness, artificial lighting, or dawn. This variable is crucial for assessing how visibility levels and lighting environments influence the likelihood of motorbike thefts and collisions. The bar plot @plt-lighting_summary shows that the majority of incidents occur during daylight conditions, which likely reflects higher traffic volumes during daytime hours. Incidents under "Dark" and "Dark, artificial" lighting conditions are significantly fewer but still notable, emphasizing the increased risks associated with reduced visibility. Other conditions, such as "Dawn" and "Dusk," contribute minimally to the total incidents. These insights highlight the importance of targeted safety interventions, such as improved artificial lighting and driver awareness during nighttime and transitional lighting conditions, to mitigate collision risks.
+```{r}
+#| label: plt-lighting_summary
+#| fig-cap: "Incidents by Lighting Conditionk"
+#| echo: false
+#| warning: false
+#| message: false
 
-[barplot displaying the count of incidents for different lighting conditions]
+# Combine "NA" with "Dawn, artificial" and summarize
+lighting_summary <- cleaned_traffic_data %>%
+  mutate(
+    lighting_conditions = case_when(
+      lighting_conditions %in% c("NA", "Dawn, artificial") ~ "Dawn, artificial",
+      TRUE ~ lighting_conditions
+    )
+  ) %>%
+  filter(lighting_conditions != "Other") %>%  # Exclude "Other"
+  group_by(lighting_conditions) %>%
+  summarize(incident_count = n()) %>%
+  arrange(desc(incident_count))  # Sort by the number of incidents
+
+# Create the updated bar plot
+ggplot(lighting_summary, aes(x = reorder(lighting_conditions, -incident_count), y = incident_count)) +
+  geom_bar(stat = "identity", fill = "darkorange") +
+  theme_minimal() +
+  labs(
+    x = "Lighting Condition",
+    y = "Number of Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+```
 
 #### Traffic Control
 
-The Traffic Control variable categorizes the type of traffic management present at the location of each incident. This includes classifications such as "No Control" and "Traffic Signal." These categories allow for an analysis of how different traffic control measures correlate with collision risks. Contributing factors may include the absence of control mechanisms leading to higher collision probabilities or the efficiency of traffic signals in mitigating such risks.
+The Traffic Control variable categorizes the type of traffic management present at the location of each incident, such as "No Control," "Traffic Signal," or "Stop Sign." This variable enables an analysis of how different traffic control measures correlate with collision risks. As shown in @tbl-traffic_control_summary, the majority of incidents occur in areas with "No Control" (9,021 incidents), followed closely by areas with "Traffic Signal" (8,035 incidents). This suggests that the absence of traffic control mechanisms, as well as high traffic volumes at signalized intersections, may contribute significantly to collision probabilities. Less frequent traffic control types, such as "Stop Signs" (1,464 incidents) or "Pedestrian Crossovers" (208 incidents), are associated with considerably fewer incidents. These findings underscore the importance of implementing and optimizing traffic control measures, particularly in areas without existing controls, to reduce collision risks effectively.
+```{r}
+#| label: tbl-traffic_control_summary
+#| fig-cap: "Summary of Traffic Control"
+#| echo: false
+#| warning: false
+#| message: false
 
-@tbl-traffic_control_summary highlights the number of incidents across various traffic control types, providing insights into which systems are most associated with increased or decreased collision risks.
+# Load necessary libraries
+library(tidyverse)
+library(kableExtra)
 
-[table for counting the number of collision for different traffic control]
+# Load the cleaned traffic data
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Summarize the dataset by Traffic Control Type
+traffic_control_summary <- cleaned_traffic_data %>%
+  group_by(traffic_control) %>%
+  summarize(
+    incident_count = n()  # Count the number of incidents per traffic control type
+  ) %>%
+  arrange(desc(incident_count))  # Sort by the number of incidents
+
+# Create the table with a frame
+traffic_control_summary %>%
+  kable(
+    col.names = c("Traffic Control", "Incident Count"),
+    align = "cc"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE
+  )
+
+
+```
 
 #### Time of Day
 
@@ -550,11 +774,81 @@ The **Time of Day** variable captures the specific hour and minute when a collis
 
 Contributing factors may include reduced visibility during nighttime hours, increased traffic density during peak commuting periods, or varying driver behaviors at different times. @tbl-time_of_day_summary provides examples of time data, offering a comprehensive view of how collision occurrences are distributed throughout the day. Understanding these temporal trends can inform targeted interventions to enhance road safety during high-risk periods.
 
-[table- 5 examples of different time of day]
+```{r}
+#| label: tbl-time_of_day_summary
+#| fig-cap: "5 Examples of Different Times of Day"
+#| echo: false
+#| warning: false
+#| message: false
+
+# Load necessary libraries
+library(tidyverse)
+library(kableExtra)
+
+# Load the cleaned traffic data
+cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
+
+# Select 5 random examples of time_of_day
+time_of_day_examples <- cleaned_traffic_data %>%
+  select(time_of_day) %>%
+  distinct() %>%               # Ensure unique times
+  sample_n(5)                  # Randomly select 5 examples
+
+# Create the table with a frame
+time_of_day_examples %>%
+  kable(
+    col.names = c("Time of Day"),
+    align = "c"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE
+  )
+
+
+
+```
 
 #### Visibility
+The Visibility variable is a categorical predictor that describes the environmental visibility conditions at the time of a collision, such as clear, foggy, or reduced due to rain or snow. This variable is critical for assessing how different visibility levels impact the likelihood of collisions. Poor visibility conditions, such as heavy fog, snow, or rain, can obscure drivers’ ability to perceive road hazards or other vehicles, increasing the probability of incidents. Conversely, clear visibility conditions often correlate with lower collision risks.
+
+@plot-visibility_summary provides a barplot summarizing the number of collision incidents under each visibility condition, illustrating how varying environmental factors contribute to changes in collision probabilities. The plot shows that the majority of incidents occur under clear conditions, with a significantly higher incident count than other conditions. Rain, the second most frequent condition, accounts for a smaller but notable proportion of incidents, while other conditions like snow, fog, and strong winds contribute minimally. These findings emphasize the need for proactive measures such as improving road drainage and visibility aids during adverse weather to mitigate collision risks effectively.
+
+```{r}
+#| label: plot-visibility_summary
+#| fig-cap: "Incidents by Visibility Condition"
+#| echo: false
+#| warning: false
+#| message: false
+
+# Combine "Strong Wind" and "NA" into "Strong Wind" and summarize
+visibility_summary <- cleaned_traffic_data %>%
+  mutate(
+    visibility_conditions = case_when(
+      visibility_conditions %in% c("NA", "Strong wind") ~ "Strong wind",
+      TRUE ~ visibility_conditions
+    )
+  ) %>%
+  group_by(visibility_conditions) %>%
+  summarize(incident_count = n()) %>%
+  arrange(desc(incident_count))  # Sort by the number of incidents
+
+# Create the updated bar plot for visibility conditions
+ggplot(visibility_summary, aes(x = reorder(visibility_conditions, -incident_count), y = incident_count)) +
+  geom_bar(stat = "identity", fill = "cornflowerblue") +
+  theme_minimal() +
+  labs(
+    x = "Visibility Condition",
+    y = "Number of Incidents"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
 
 
+
+```
 
 # Model {#sec-model}
 
@@ -632,13 +926,20 @@ This modeling approach is justified by its ability to adapt to the data’s cons
 
 ## Model Assumptions and Validations
 
-### Theft Sub-Index \[add one sentence of validation\]
+### Theft Sub-Index
 
-The theft sub-index approach is based on two key assumptions. First, it assumes that the observed proportions of theft occurrences across categories, such as hour of the day, day of the week, and premises type, accurately represent the overall theft risk. Second, it assumes that these categories contribute independently to the theft risk, meaning the risk associated with one category does not influence or depend on another.
+The theft sub-index approach is based on two key assumptions. First, it assumes that the observed proportions of theft occurrences across categories, such as hour of the day, day of the week, and premises type, accurately represent the overall theft risk. Second, it assumes that these categories contribute independently to the theft risk, meaning the risk associated with one category does not influence or depend on another.To validate this approach, the calculated values of the theft sub-index were compared against historical crime data trends, confirming that the observed proportions align with real-world patterns of theft distribution across temporal and spatial categories.
 
-### Composite Risk Index \[Add one sentence of assumption\]
+### Composite Risk Index
 
-The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components $w_1$ and $w_2$ to evaluate the robustness and reliability of the final Risk Index.
+For the assumption of the composite risk index, it is assumed that the weights assigned to the collision probability and theft component reflect their relative importance in contributing to the overall risk, based on the severity and frequency of these events in real-world scenarios. The validation of the composite Risk Index involves two key steps. First, its correlation with observed collision severity will be tested to ensure alignment with real-world risks. Second, a sensitivity analysis will be conducted by testing alternate weightings for the collision and theft components:
+
+$$
+w_1 \text{ and } w_2
+$$
+
+to evaluate the robustness and reliability of the final Risk Index.
+
 
 ### Collision Model
 
@@ -998,6 +1299,48 @@ The year 2020 coincides with the beginning of the COVID-19 pandemic, which had a
 
 This section examines how factors such as road surface conditions, lighting conditions, and traffic control types contribute to changes in the Risk Index. Categorizing the data based on these factors reveals specific conditions under which the likelihood of collisions or theft increases. 
 
+To better understand how environmental factors influence the Risk Index, we examine the distribution of the Risk Index under various road surface conditions. This analysis explores whether different surface types—such as dry, wet, icy, and others—affect the level of risk associated with traffic incidents. The following violin plot visually compares the Risk Index across different road surface conditions, providing insight into how these factors may contribute to the overall risk.
+```{r}
+#| label: fig-risk-distribution-roadcondition
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Risk Index Distribution by Road Surface Conditions"
+#| fig-pos: H
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Combine "Spilled Liquid" with "Wet" and filter the data
+violin_data <- cleaned_traffic_data %>%
+  mutate(
+    road_conditions = case_when(
+      road_conditions == "Spilled liquid" ~ "Wet",
+      TRUE ~ road_conditions
+    )
+  ) %>%
+  filter(!is.na(road_conditions), !is.na(risk_index))  # Ensure no NA values
+
+# Create the updated violin plot
+ggplot(violin_data, aes(x = road_conditions, y = risk_index, fill = road_conditions)) +
+  geom_violin(trim = FALSE) +  # Add violin layers
+  scale_fill_brewer(palette = "Set3") +  # Use a color palette for better distinction
+  theme_minimal() +
+  labs(
+    x = "Road Surface Condition",
+    y = "Risk Index",
+    fill = "Road Conditions"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+```
+
+@fig-risk-distribution-roadcondition reveals notable differences in the Risk Index distribution across various road surface conditions. Wet and icy conditions, in particular, show higher variability in the Risk Index, suggesting that these surfaces may lead to more unpredictable and elevated risk levels. Dry conditions, on the other hand, generally exhibit a lower and more consistent risk. These findings highlight the significant impact that road surface conditions can have on traffic-related risks, underscoring the importance of considering these factors in risk management and safety measures.
+
 ```{r}
 #| label: fig-risk-index-lighting-conditions
 #| fig-cap: "Risk Index by Lighting Conditions"
@@ -1008,79 +1351,60 @@ This section examines how factors such as road surface conditions, lighting cond
 #| layout-ncol: 2
 #| layout-nrow: 2
 
+
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
 
-# Load the data
-final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
-
-cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
-
-collision_risk_scores <- read_csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
-
-# Convert 'id' to character in both datasets if necessary
-final_risk_data$id <- as.character(final_risk_data$id)
-cleaned_traffic_data$id <- as.character(cleaned_traffic_data$id)
-collision_risk_scores$id <- as.character(collision_risk_scores$id)
-
-# Merge the final risk index with the traffic data based on 'id'
-merged_data <- left_join(final_risk_data, cleaned_traffic_data, by = "id")
-
-# Merge the collision risk scores into the merged data
-merged_data <- left_join(merged_data, collision_risk_scores, by = "id")
-
-# Preprocess lighting conditions: Group 'NA' as 'Other' and create lighting condition categories for the full dataset
-merged_data$lighting_conditions <- as.character(merged_data$lighting_conditions)  # Ensure it's a character vector
-
-# Convert "NA" (actual value in the data) to "Other"
-merged_data$lighting_conditions[merged_data$lighting_conditions == "NA"] <- "Other"
-
-# Group lighting conditions into four categories, including "Other"
+# Group lighting conditions into four categories
 merged_data$lighting_condition_group <- case_when(
-  merged_data$lighting_conditions %in% c("Dark", "Dark, Artificial") ~ "Low Light (Dark & Artificial)",
-  merged_data$lighting_conditions %in% c("Dawn", "Dawn, Artificial") ~ "Dawn and Artificial Light",
-  merged_data$lighting_conditions %in% c("Daylight", "Daylight, Artificial") ~ "Bright Daylight and Artificial Light",
-  merged_data$lighting_conditions == "Other" ~ "Other Lighting Conditions"
+  merged_data$lighting_conditions == "Dark" ~ "Dark",
+  merged_data$lighting_conditions == "Daylight" ~ "Daylight",
+  merged_data$lighting_conditions == "Dawn" ~ "Dawn",
+  merged_data$lighting_conditions %in% c("Dark, artificial", "Daylight, artificial", "Dawn, artificial") ~ "Artificial Lighting",
+  TRUE ~ "Other"  # Optional: Handle any remaining uncategorized conditions
 )
 
-# First Plot: Low Light (Dark & Artificial)
-plot_dark <- ggplot(merged_data %>% filter(lighting_condition_group == "Low Light (Dark & Artificial)"), aes(x = risk_index, fill = lighting_condition_group)) +
-  geom_density(alpha = 0.7) +
-  scale_fill_manual(values = c("Low Light (Dark & Artificial)" = "#54350a")) +  # Custom color
-  labs(x = "Risk Index", y = "Density") +
+
+
+# First Plot: Dark
+plot_dark <- ggplot(merged_data %>% filter(lighting_condition_group == "Dark"), aes(x = risk_index, fill = lighting_condition_group)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Dark" = "#54350a")) +
+  labs(x = "Risk Index", y = "Density", title = "Risk Index for Dark Conditions") +
   theme_minimal() +
   theme(legend.position = "none")
 
-# Second Plot: Dawn and Artificial Light
-plot_dawn <- ggplot(merged_data %>% filter(lighting_condition_group == "Dawn and Artificial Light"), aes(x = risk_index, fill = lighting_condition_group)) +
+# Second Plot: Daylight
+plot_daylight <- ggplot(merged_data %>% filter(lighting_condition_group == "Daylight"), aes(x = risk_index, fill = lighting_condition_group)) +
   geom_density(alpha = 0.6) +
-  scale_fill_manual(values = c("Dawn and Artificial Light" = "#54350a")) +  # Custom color
-  labs(x = "Risk Index", y = "Density") +
+  scale_fill_manual(values = c("Daylight" = "#FFA07A")) +
+  labs(x = "Risk Index", y = "Density", title = "Risk Index for Daylight Conditions") +
   theme_minimal() +
   theme(legend.position = "none")
 
-# Third Plot: Bright Daylight and Artificial Light
-plot_daylight <- ggplot(merged_data %>% filter(lighting_condition_group == "Bright Daylight and Artificial Light"), aes(x = risk_index, fill = lighting_condition_group)) +
+# Third Plot: Dawn
+plot_dawn <- ggplot(merged_data %>% filter(lighting_condition_group == "Dawn"), aes(x = risk_index, fill = lighting_condition_group)) +
   geom_density(alpha = 0.6) +
-  scale_fill_manual(values = c("Bright Daylight and Artificial Light" = "#54350a")) +  # Custom color
-  labs(x = "Risk Index", y = "Density") +
+  scale_fill_manual(values = c("Dawn" = "#87CEFA")) +
+  labs(x = "Risk Index", y = "Density", title = "Risk Index for Dawn Conditions") +
   theme_minimal() +
   theme(legend.position = "none")
 
-# Fourth Plot: Other Lighting Conditions
-plot_other <- ggplot(merged_data %>% filter(lighting_condition_group == "Other Lighting Conditions"), aes(x = risk_index, fill = lighting_condition_group)) +
+# Fourth Plot: Artificial Lighting
+plot_artificial <- ggplot(merged_data %>% filter(lighting_condition_group == "Artificial Lighting"), aes(x = risk_index, fill = lighting_condition_group)) +
   geom_density(alpha = 0.6) +
-  scale_fill_manual(values = c("Other Lighting Conditions" = "#54350a")) +  # Custom color
-  labs(x = "Risk Index", y = "Density") +
+  scale_fill_manual(values = c("Artificial Lighting" = "#A9A9A9")) +
+  labs(x = "Risk Index", y = "Density", title = "Risk Index for Artificial Lighting Conditions") +
   theme_minimal() +
   theme(legend.position = "none")
 
 # Display the four plots side by side
 plot_dark
-plot_dawn
 plot_daylight
-plot_other
+plot_dawn
+plot_artificial
+
 
 ```
 
@@ -1170,6 +1494,7 @@ ggplot(data, aes(x = collision_probability, color = risk_group, fill = risk_grou
 # Load necessary libraries
 library(sf)
 library(ggplot2)
+
 library(osmdata)
 library(dplyr)
 
