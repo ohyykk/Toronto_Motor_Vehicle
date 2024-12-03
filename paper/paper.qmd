@@ -1615,8 +1615,7 @@ ggplot() +
   labs(
     x = "Longitude",
     y = "Latitude",
-    color = "Neighborhood Type",
-    title = "Neighborhood Collision Points in Toronto"
+    color = "Neighborhood Type"
   ) +
   theme_minimal()
 
