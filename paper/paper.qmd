@@ -330,21 +330,18 @@ The structure of the paper is organized as follows: following @sec-intro, @sec-d
 
 # Data {#sec-data}
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
-
-\[Libraries To be updated...\]
+This project is motivated and guided by Rohan Alexander and his book [@tellingstories]. Data used in this paper was cleaned, analyzed and modeled with the programming language R [@citeR]. Also with support of additional packages in R: `readr` [@citeReadr], `ggplot2` [@citeGgplot2], `tidyverse` [@citeTidyverse], `dplyr` [@citeDplyr], `here` [@citeHere], `knitr` [@citeKnitr], `kableExtra` [@citeKableExtra], `palmerpenguins` [@citePalmerpenguins], `performance` [@citePerformance], `tidygraph` [@citeTidygraph], `ggraph` [@citeGgraph], `lubridate` [@citeLubridate], `sf` [@citeSf], `osmdata` [@citeOsmdata], `car` [@citeCar],
 
 Details about the data cleaning process and the criteria for variable selection are provided in Appendix A.
 
 ## Source
 
-This study utilized two datasets published by the Toronto Police Service, available from Open Data Toronto [@OpendataToronto]. The first dataset focuses on motor vehicle collisions involving killed or seriously injured persons (KSI), while the second examines thefts from motor vehicles.
+This study utilized two datasets published by the Toronto Police Service, available from Open Data Toronto [@citeODT]. The first dataset focuses on motor vehicle collisions involving killed or seriously injured persons (KSI), while the second examines thefts from motor vehicles.
 
 The Motor Vehicle Collisions dataset includes all reported incidents in which a person was either killed or seriously injured since 2006. It offers detailed information about each collision, such as the type of incident, the severity of injuries, and the location of the event, when available. Additionally, the dataset includes fields for both the old 140 and new 158 neighborhood structures in Toronto, allowing for flexible neighborhood-level analysis across different definitions.
 
 The Theft from Motor Vehicle dataset contains all reported occurrences of thefts from vehicles, categorized by reported date. These offences are classified based on the value of the stolen items, distinguishing between theft under and theft over thresholds. Each occurrence number may include multiple rows, representing the various offences associated with a single event. The dataset excludes "unfounded" occurrences, adhering to Statistics Canada’s definition that these events were determined not to have occurred or been attempted. Like the KSI dataset, this dataset includes fields for both the old and new neighborhood structures, enabling comprehensive geographic analyses of theft trends.
 
-\[Add variable types and trends\]
 
 ## Data Measurement and Limitations
 
@@ -368,7 +365,7 @@ The outcome variable of this analysis is the Risk Index, a composite metric that
 #| fig-cap: "Distribution of the Overall Risk Index"
 #| fig-pos: H
 #| fig-width: 8 
-#| fig-height: 4 
+#| fig-height: 3.5 
 
 # Load necessary libraries
 library(tidyverse)
@@ -402,6 +399,8 @@ The skewness and spread of the distribution highlight the variability in the com
 #| message: false
 #| fig-cap: "Risk Index Distribution by Risk Category"
 #| fig-pos: H
+#| fig-width: 8 
+#| fig-height: 4 
 
 library(ggplot2)
 library(dplyr)
@@ -575,10 +574,10 @@ ggplot(day_summary, aes(x = day_of_week, y = theft_count)) +
 
 #### Premises Type
 
-The **Premises Type** variable is included as a predictor to examine the contextual environments where motorbike theft incidents are most prevalent. This variable categorizes thefts by location type, such as outdoor spaces, residential areas, or commercial properties, to identify settings associated with higher or lower risks. @plt-premises_summary highlights that outdoor locations account for the majority of thefts, followed by residential areas like houses and apartments, while locations such as educational and transit premises illustrates much lower incident counts. These patterns suggest that factors such as accessibility, lack of surveillance, and the density of parked motorbikes significantly influence theft risks across different premises types. Incorporating this variable allows the model to account for environmental factors, improving its ability to predict theft occurrences based on location characteristics.
+The **Premises Type** variable is included as a predictor to examine the contextual environments where motorbike theft incidents are most prevalent. This variable categorizes thefts by location type, such as outdoor spaces, residential areas, or commercial properties, to identify settings associated with higher or lower risks. @fig-premises_summary highlights that outdoor locations account for the majority of thefts, followed by residential areas like houses and apartments, while locations such as educational and transit premises illustrates much lower incident counts. These patterns suggest that factors such as accessibility, lack of surveillance, and the density of parked motorbikes significantly influence theft risks across different premises types. Incorporating this variable allows the model to account for environmental factors, improving its ability to predict theft occurrences based on location characteristics.
 
 ```{r}
-#| label: plt-premises_summary
+#| label: fig-premises_summary
 #| fig-cap: "Theft Incidents by Day of the Week"
 #| echo: false
 #| fig-width: 8
@@ -660,10 +659,10 @@ example_neighborhoods %>%
 
 The **Road Surface Condition** variable serves as a categorical predictor, detailing the state of the road at the time of an incident. Categories include dry, wet, loose snow, slush, ice, packed snow, and others. This variable enables the analysis to assess how different surface conditions contribute to motorbike collision risks.
 
-@plot-road_surface_summary illustrates the number of incidents under each road surface condition, showing that most incidents occur on dry roads, followed by wet roads. Conditions such as loose snow, ice, and packed snow account for a smaller proportion of incidents, reflecting their lower occurrence frequency. However, these different surface conditions may represent a disproportionately high risk per unit of exposure. This distribution underscores the importance of accounting for surface conditions in collision prevention strategies, especially during adverse weather, to enhance road safety and reduce risks.
+@fig-road_surface_summary illustrates the number of incidents under each road surface condition, showing that most incidents occur on dry roads, followed by wet roads. Conditions such as loose snow, ice, and packed snow account for a smaller proportion of incidents, reflecting their lower occurrence frequency. However, these different surface conditions may represent a disproportionately high risk per unit of exposure. This distribution underscores the importance of accounting for surface conditions in collision prevention strategies, especially during adverse weather, to enhance road safety and reduce risks.
 
 ```{r}
-#| label: plot-road_surface_summary
+#| label: fig-road_surface_summary
 #| fig-cap: "Incidents by Road Surface Condition"
 #| echo: false
 #| warning: false
@@ -700,10 +699,10 @@ ggplot(road_surface_summary, aes(x = reorder(road_conditions, -incident_count), 
 
 The **Lighting Condition** variable is a categorical predictor that describes the lighting environment at the time of an incident, including categories such as daylight, darkness, artificial lighting, and transitional periods like dawn and dusk. This variable helps analyze how visibility and lighting conditions impact the likelihood of motorbike thefts and collisions.
 
-@plt-lighting_summary illustrates that the majority of incidents occur during daylight hours, likely due to higher traffic volumes and activity levels during the day. Incidents under "Dark" and "Dark, artificial" conditions are less frequent but still significant, highlighting the increased risks associated with poor visibility. Transitional conditions like "Dawn" and "Dusk" contribute minimally to the total number of incidents. These findings emphasize the need for targeted safety measures, such as enhancing artificial lighting and promoting driver vigilance in low-visibility conditions, to reduce collision risks effectively.
+@fig-lighting_summary illustrates that the majority of incidents occur during daylight hours, likely due to higher traffic volumes and activity levels during the day. Incidents under "Dark" and "Dark, artificial" conditions are less frequent but still significant, highlighting the increased risks associated with poor visibility. Transitional conditions like "Dawn" and "Dusk" contribute minimally to the total number of incidents. These findings emphasize the need for targeted safety measures, such as enhancing artificial lighting and promoting driver vigilance in low-visibility conditions, to reduce collision risks effectively.
 
 ```{r}
-#| label: plt-lighting_summary
+#| label: fig-lighting_summary
 #| fig-cap: "Incidents by Lighting Conditionk"
 #| echo: false
 #| warning: false
@@ -828,10 +827,10 @@ time_of_day_summary %>%
 
 The **Visibility** variable is a categorical predictor that captures environmental visibility conditions at the time of a collision, such as clear, rain, snow, fog, or strong winds. This variable is essential for understanding how varying visibility levels influence collision risks. Reduced visibility conditions, such as those caused by rain or snow, can impair drivers' ability to detect road hazards or other vehicles, increasing the likelihood of incidents. Conversely, clear conditions often correlate with safer driving environments.
 
-@plot-visibility_summary summarizes the distribution of collisions across different visibility conditions, revealing that the vast majority of incidents occur during clear conditions. This is likely due to the overall higher frequency of clear weather compared to adverse conditions. Rain accounts for the second-highest number of incidents, while other conditions, such as snow, fog, and strong winds, contribute to a much smaller share of collisions. 
+@fig-visibility_summary summarizes the distribution of collisions across different visibility conditions, revealing that the vast majority of incidents occur during clear conditions. This is likely due to the overall higher frequency of clear weather compared to adverse conditions. Rain accounts for the second-highest number of incidents, while other conditions, such as snow, fog, and strong winds, contribute to a much smaller share of collisions. 
 
 ```{r}
-#| label: plot-visibility_summary
+#| label: fig-visibility_summary
 #| fig-cap: "Incidents by Visibility Condition"
 #| echo: false
 #| warning: false
@@ -894,7 +893,7 @@ This approach ensures proportional representation of each factor while accountin
 
 ### Collision Probability Model
 
-A logistic regression model was used to predict the likelihood of severe collisions P(Collision) based on several predictors. The log-odds of the collision probability are modeled as:  
+A logistic regression model was used to predict the likelihood of severe collisions P(Collision) based on several predictors. The log-odds of the collision probability are modeled as:
 
 ```{=tex}
 \begin{align*}
@@ -969,7 +968,7 @@ A fundamental assumption of logistic regression is that the response variable is
 
 In the theft dataset, however, all entries represent theft cases, precluding the binary nature required for logistic regression. Consequently, the theft model was adapted to calculate proportion-based sub-indexes rather than relying on a binary outcome. These sub-indexes represent relative risk based on temporal and spatial factors, such as hour of the day, day of the week, and premises type.
 
-In the collision model: - The model estimates the probability of a severe collision ((P(\text{Collision}))) given environmental and situational predictors. The response variable (`severity`) is defined as: \begin{align*}
+In the collision model: - The model estimates the probability of a severe collision (P(\text{Collision}) given environmental and situational predictors. The response variable (`severity`) is defined as: \begin{align*}
   P(\text{Collision}) = \frac{\exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}{1 + \exp(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k)}
   \end{align*} where: \begin{align*}
   \beta_0 &\text{ is the intercept,} \\
@@ -985,7 +984,7 @@ The collision model assumes that each observation is independent of the others, 
 
 #### Linear Relationship in the Log-Odds
 
-One of the key assumptions in logistic regression is that a linear relationship exists between the continuous predictors and the logit of the outcome variable [@stoltzfus2011]. This means that the log-odds of the binary dependent variable should have a linear association with any continuous independent variables in the model. It is important to test this assumption to ensure the validity of the model.
+One of the key assumptions in logistic regression is that a linear relationship exists between the continuous predictors and the logit of the outcome variable [@stoltzfus2011logistic]. This means that the log-odds of the binary dependent variable should have a linear association with any continuous independent variables in the model. It is important to test this assumption to ensure the validity of the model.
 
 The collision risk logistic regression model incorporates both categorical and continuous predictor variables. Among these, Time of Day serves as the sole continuous predictor, representing the time an incident occurred as a numerical value ranging from 0 (midnight) to 2359 (just before midnight). The analysis emphasizes the continuous predictor, Time of Day, to evaluate its role within the collision model.
 
@@ -996,6 +995,7 @@ Linearity is assessed using smoothed scatter plots of the predicted logit values
 \text{logit} = \log\left(\frac{P}{1 - P}\right)
 \end{align*}
 ```
+
 where P represents the predicted probability of collision from the logistic regression model plotted against the continuous predictors. These plots are intended to visualize the relationship between each predictor and the logit of the outcome variable, providing insight into whether the relationship is approximately linear.
 
 ```{r}
@@ -1049,11 +1049,11 @@ In this plot, the smoothed line shows a relatively stable trend with minimal dev
 
 #### Absence of Multicollinearity
 
-Another key assumption of logistic regression is the absence of multicollinearity among predictor variables. Multicollinearity occurs when two or more predictors are highly correlated, leading to inflated standard errors of the regression coefficients and reducing the reliability of the model's estimates. The Variance Inflation Factor (VIF) is commonly used to assess multicollinearity, with VIF values greater than 5 indicating potential issues, and values above 10 suggesting severe multicollinearity [@stoltzfus2011].
+Another key assumption of logistic regression is the absence of multicollinearity among predictor variables. Multicollinearity occurs when two or more predictors are highly correlated, leading to inflated standard errors of the regression coefficients and reducing the reliability of the model's estimates. The Variance Inflation Factor (VIF) is commonly used to assess multicollinearity, with VIF values greater than 5 indicating potential issues, and values above 10 suggesting severe multicollinearity [@stoltzfus2011logistic].
 
 In the collision risk model, the predictors include both categorical variables (Lighting Conditions, Road Conditions, Visibility Conditions and Traffic Control) and one continuous variable (Time of Day). VIF calculations are performed to evaluate the degree of multicollinearity among these predictors.
 
-If multicollinearity is detected, strategies such as combining correlated variables, removing redundant predictors, or using regularization techniques like ridge regression can be employed [@stoltzfus2011]. However, if VIF values remain below the threshold, it confirms that multicollinearity is not a concern in this analysis.
+If multicollinearity is detected, strategies such as combining correlated variables, removing redundant predictors, or using regularization techniques like ridge regression can be employed [@stoltzfus2011logistic]. However, if VIF values remain below the threshold, it confirms that multicollinearity is not a concern in this analysis.
 
 The following table presents the VIF values for all predictors in the collision risk model.
 
@@ -1333,7 +1333,6 @@ ggplot(risk_trends_2020, aes(x = report_date, y = avg_risk_index)) +
   labs(
     x = "Month",
     y = "Average Risk Index",
-    title = "Risk Index Variations in 2020 during Covid-19"
   ) +
   theme_minimal() +
   theme(
@@ -1628,19 +1627,23 @@ This map provides a critical spatial perspective, highlighting the geographic di
 
 ## Temporal Risk Patterns and Behavioral Recommendations
 
-This study highlights significant temporal variations in motorbike theft and collision risks, revealing clear patterns that can inform both behavioral changes and policy interventions. The analysis shows that theft incidents peak during late-night hours, particularly between [specific time range], when surveillance and public activity are minimal. Similarly, collision risks are concentrated during [specific time range], corresponding to high-traffic periods such as morning and evening rush hours. These findings underscore the importance of time-sensitive strategies to mitigate risks.
+This study highlights distinct temporal variations in the motorbike theft and collision Risk Index, providing valuable insights for both behavioral adaptations and policy interventions. Collision risk shows a clear temporal pattern, peaking during Morning (7–9 AM) and Evening (5–7 PM) periods, which correspond to high traffic density during commuting hours. This reinforces the critical link between collision risk and traffic patterns, emphasizing the need for heightened caution and enhanced safety measures during these high-risk periods to reduce the likelihood of collisions and improve road safety. In contrast, theft risk remains stable across all time bins, showing no significant fluctuations. To enhance visibility of theft risk in the data, its values were scaled by a factor of 10, demonstrating its consistently smaller contribution to the overall Risk Index.
+
+The Morning time segment exhibits the highest overall Risk Index, driven by elevated collision risk. The Afternoon and Evening segments show slightly lower Risk Index values, reflecting moderate variations in collision risk. Conversely, the Early Morning segment has the lowest Risk Index, corresponding to minimal traffic activity and theft incidents. These patterns underscore the importance of adopting time-sensitive strategies for mitigating risks during specific periods.
 
 ### Behavioral Recommendations for Motorbike Owners
-Motorbike owners can adopt several precautionary measures based on the identified temporal risk patterns, including avoiding high-risk hours, enhancing security measures, and having defensive driving practices. Restricting motorbike use during late-night hours or parking in secure locations equipped with surveillance can significantly reduce theft exposure; utilizing anti-theft devices, such as GPS trackers or motion-sensitive alarms, can deter theft, particularly during vulnerable time periods; exercising heightened caution during peak traffic hours, adhering to speed limits and maintaining safe distances can minimize the collision risks.
+
+Motorbike owners can take several proactive measures to mitigate risks based on the identified temporal patterns. These include avoiding high-risk hours, strengthening security measures, and practicing defensive driving. For theft prevention, owners should limit motorbike use during late-night hours or park in secure locations with surveillance systems. Utilizing anti-theft devices such as GPS trackers or motion-sensitive alarms can effectively deter theft, particularly during vulnerable periods. To reduce collision risks, motorbike owners should exercise extra caution during peak traffic hours, adhere to speed limits, and maintain safe distances to ensure safer driving conditions.
 
 ### Policy Recommendations for Stakeholders
-Policymakers and law enforcement agencies can leverage several insights to develop targeted interventions. First is to have time-sensitive patrol scheduling by increasing law enforcement presence during high-theft hours to act as a deterrent and ensure faster response times. One can also develop traffic monitoring during rush hours such as surveillance cameras and traffic officers to help manage congestion and reduce collision risks. Another idea could be to have public awareness campaigns and educational initiatives to inform motorbike owners about high-risk times and promote safety practices tailored to temporal risk patterns.
+
+Policymakers and law enforcement agencies can implement targeted strategies informed by these insights. Increasing law enforcement presence during high-theft hours through time-sensitive patrols can serve as a deterrent and ensure quicker response times. Enhanced traffic monitoring during rush hours, using surveillance cameras and traffic officers, can help manage congestion and reduce collision risks. Additionally, public awareness campaigns and educational initiatives can inform motorbike owners about high-risk periods and promote safety practices tailored to temporal risk patterns, fostering a safer environment for all road users.
 
 ## Environmental and Situational Influences on Risk
 
-Environmental and situational factors significantly influence the Risk Index, highlighting their role in motorbike thefts and collisions. This study identified critical predictors, such as road surface conditions, lighting environments, and traffic control mechanisms, which collectively shape risk levels. Poor road conditions, inadequate lighting, and the absence of traffic control systems emerge as key contributors to heightened risks.
+Environmental and situational factors play a pivotal role in shaping the Risk Index, emphasizing their impact on motorbike thefts and collisions. This study identified key predictors, including road surface conditions, lighting environments, and traffic control mechanisms, that collectively contribute to variations in risk levels. Poor road conditions, inadequate lighting, and the absence of effective traffic control measures are identified as major contributors to elevated risks.
 
-Wet or icy road surfaces significantly increase collision risks, likely due to reduced traction and longer braking distances. Dry roads, while more common, are not risk-free and often correlate with higher traffic volumes. Low-light conditions, especially at night and under artificial lighting, exacerbate risks due to reduced visibility and delayed reaction times. While daylight offers better visibility, high traffic density during daytime hours can still elevate risk levels. The absence of traffic controls, such as stop signs or traffic signals, is associated with higher incident rates, underscoring their importance in mitigating risks.
+Wet or icy road surfaces significantly heighten collision risks due to reduced traction and extended braking distances. Although dry roads are the most common, they are not devoid of risk, often correlating with higher traffic volumes that increase collision likelihood. Low-light conditions, particularly at night or under artificial lighting, further amplify risks by reducing visibility and reaction times. While daylight conditions offer improved visibility, high traffic density during peak hours introduces additional risks. Moreover, areas lacking traffic control measures, such as stop signs or traffic signals, experience elevated incident rates, highlighting the critical role of such infrastructure in mitigating risks.
 
 ### Recommendations for Stakeholders
 
@@ -1657,19 +1660,39 @@ By understanding and addressing these environmental and situational risks, polic
 
 ## Policy Implications of Spatial Risk Disparities
 
-Focus: This section can discuss the significant disparities in the Risk Index across neighborhoods. Highlight how certain areas are disproportionately affected by theft or collisions and the potential socioeconomic or infrastructure factors contributing to these risks.
+This study highlights significant spatial disparities in the Risk Index across neighborhoods, revealing that certain areas are disproportionately affected by motorbike thefts and collisions. These disparities often correlate with socioeconomic factors, infrastructure quality, and population density, underscoring the need for targeted interventions. 
 
-Key Points: Prioritizing high-risk neighborhoods for targeted interventions, such as improved street lighting or traffic control measures. Suggestions for law enforcement strategies to reduce theft in hotspots. Need for localized awareness campaigns in high-risk areas.
+The analysis identifies several neighborhoods with consistently high Risk Index values. These areas are often characterized by limited law enforcement presence, inadequate lighting, and poor road conditions, making them hotspots for theft and collisions. Conversely, neighborhoods with lower Risk Index values typically have better infrastructure, higher socioeconomic status, and a stronger law enforcement presence, which collectively contribute to enhanced safety.
+
+### Recommendations for Policymakers
+
+1. Infrastructure Upgrades: Improve street lighting in high-risk neighborhoods to enhance visibility and deter criminal activity; address road surface issues, such as potholes and uneven pavements, to reduce collision risks.
+
+2. Law Enforcement Strategies: Increase patrols in theft-prone areas during high-risk times to enhance deterrence and response capabilities; employ community policing initiatives to build trust and encourage collaboration between residents and law enforcement.
+
+3. Localized Awareness Campaigns: Conduct education campaigns in high-risk neighborhoods to raise awareness about theft prevention measures and safe driving practices; provide subsidized access to anti-theft devices for residents in vulnerable areas.
+
+4. Equitable Urban Planning: prioritize investments in underserved neighborhoods to address systemic inequities that contribute to heightened risk levels; develop multi-stakeholder strategies involving local governments, law enforcement, and community organizations to address both immediate and long-term safety concerns.
+
+### Broader Implications
+
+The observed spatial disparities in risk not only highlight immediate safety concerns but also reflect broader socioeconomic inequalities. Addressing these disparities through targeted policies and equitable resource allocation can foster safer communities and reduce overall motorbike-related incidents.
+By adopting these evidence-based interventions, policymakers can mitigate spatial risk disparities, ensuring that safety measures are distributed equitably across neighborhoods and tailored to the unique needs of each area.
 
 ## Limitations
 
+The datasets used in the analysis contain missing or incomplete entries, particularly for variables such as road surface conditions and lighting. These gaps may introduce bias or underrepresent specific risk factors, potentially affecting the overall robustness of the findings. Additionally, the Risk Index relies on fixed weights for theft and collision components, which may oversimplify the relative importance of these factors. This static approach might not fully capture variations in risk across different contexts or over time.
+
+The temporal and geographic scope of the study is another limitation. Since the analysis is limited to a specific region and time frame, its findings may not generalize to other locations or periods with differing traffic patterns or environmental conditions. Furthermore, while the study identifies spatial disparities in risk, it does not fully integrate socioeconomic data, such as income levels or educational attainment, which could provide a deeper understanding of the factors contributing to these disparities. Lastly, the analysis does not extensively explore interactions between risk factors. For instance, the combined impact of poor lighting and wet road conditions may amplify risks in ways that were not accounted for in this study.
+
 ## Future Research
 
-Future Work1: Explore how temporal risk patterns change with seasons or special events (e.g., holidays, festivals) to refine recommendations further.
+Building on the findings and limitations of this study, future research should aim to enhance the understanding of motorbike theft and collision risks through several approaches. One direction is the development of dynamic risk models that integrate real-time data, such as weather conditions, traffic density, and law enforcement activity. These models could provide more immediate and accurate assessments of risk, enabling proactive interventions. Another area for exploration is the impact of seasonal and event-based variations. Examining how risk patterns shift during holidays, festivals, or different seasons would allow for more refined time-sensitive recommendations for both motorbike owners and policymakers.
 
-Future Work2: Develop predictive models integrating weather or real-time traffic data to dynamically assess and communicate motorbike risks.
+The inclusion of socioeconomic indicators in future studies is also critical. Variables such as income levels, unemployment rates, and population density could offer a more comprehensive view of the root causes of spatial disparities in risk. Additionally, future research should delve into the interaction effects between environmental and situational factors. For example, investigating how wet roads combined with poor lighting conditions affect risk levels could inform more nuanced interventions.
 
-Future Work3: Investigate the correlation between neighborhood-level Risk Index values and broader social or economic indicators, such as income levels or population density. \newpage
+Qualitative research with residents and stakeholders in high-risk neighborhoods could also provide valuable insights into localized challenges and solutions. By engaging directly with affected communities, researchers can design and evaluate community-centered interventions that address both motorbike theft and collision risks. Finally, longitudinal studies would enable a better understanding of how risk patterns evolve over time and provide a means to evaluate the long-term effectiveness of policy measures and infrastructure improvements. These future directions collectively offer a roadmap for advancing the study of motorbike risks and enhancing road safety.
+\newpage
 
 \appendix
 
