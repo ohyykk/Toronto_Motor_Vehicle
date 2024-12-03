@@ -1,9 +1,9 @@
 
 #### Preamble ####
 # Purpose: To analyze and visualize trends in traffic and theft data, this script includes analyses of risk index distributions, environmental predictors, temporal trends, and neighborhood-based disparities while leveraging a Bayesian model for risk analysis.
-# Author: [Your Name]
-# Date: [Today's Date]
-# Contact: [Your Email]
+# Author: Yingke He
+# Date: 25 Nov
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
 # Pre-requisites:
 # - Required R packages installed

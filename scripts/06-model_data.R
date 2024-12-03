@@ -1,8 +1,8 @@
 #### Preamble ####
 # Purpose: Calculate theft sub-indexes and output as CSV
 # Author: Yingke He
-# Date: [Insert Date]
-# Contact: [Insert Email]
+# Date: 25 Nov 2024
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
 # Pre-requisites:
 # - Data cleaned using 03-clean_data.R
