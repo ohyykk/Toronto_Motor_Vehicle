@@ -1,8 +1,8 @@
 #### Preamble ####
-# Purpose: Cleans the raw theft dataset for further analysis and includes the day of the week (`REPORT_DOW`) and saves the data in CSV format.
-# Author: [Your Name]
-# Date: [Current Date]
-# Contact: [Your Email]
+# Purpose: Cleans the raw theft and collision dataset for further analysis
+# Author: Yingke He
+# Date: 25 Nov 2024
+# Contact: kiki.he@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
 # - The `tidyverse`, `janitor`, `arrow`, and `here` packages must be installed.
