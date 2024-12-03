@@ -1,101 +1,93 @@
+
 #### Preamble ####
-# Purpose: To explore and visualize trends in crime and traffic datasets, including spatial distributions, temporal patterns, and relationships between key variables, while leveraging models for posterior predictive checks.
+# Purpose: To analyze and visualize trends in traffic and theft data, this script includes analyses of risk index distributions, environmental predictors, temporal trends, and neighborhood-based disparities while leveraging a Bayesian model for risk analysis.
 # Author: [Your Name]
-# Date: [Current Date]
+# Date: [Today's Date]
 # Contact: [Your Email]
 # License: MIT
 # Pre-requisites:
-# - Required packages must be installed
-# - Cleaning scripts for both datasets must have been run
-# - Bayesian model for traffic accidents must have been created and saved
+# - Required R packages installed
+# - 03-clean_data.R must have been run
+# - 06-model_data.R must have been run
 
 
 
 #### Workspace setup ####
 # Load libraries
 library(tidyverse)
-library(ggplot2)
 library(bayesplot)
+library(arrow)
 library(here)
 
 # Load data
-crime_data <- read_csv(here("data", "02-analysis_data", "cleaned_crime_data.csv"))
-traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
-
-# Load model
-traffic_model <- readRDS(file = here::here("models", "traffic_model.rds"))
+traffic_data <- read_parquet(here("data", "02-analysis_data", "cleaned_traffic_data.parquet"))
+theft_data <- read_parquet(here("data", "02-analysis_data", "cleaned_crime_data.parquet"))
+final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
+risk_model <- readRDS(file = here("models/final_risk_model.rds"))
 
 
 
 #### Chart 1 ####
-# Distribution of Crimes by Division
-ggplot(crime_data, aes(x = division)) +
-  geom_bar(fill = "lightblue", color = "darkblue", alpha = 0.7) +
-  labs(title = "Crime Distribution by Division", x = "Division", y = "Number of Crimes") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Distribution of Risk Index
+ggplot(final_risk_data, aes(x = risk_index)) +
+  geom_histogram(binwidth = 0.05, fill = "lightgrey", color = "darkgrey", alpha = 0.7) +
+  geom_density(aes(y = ..count..), color = "red", size = 1) +
+  labs(title = "Distribution of Risk Index", x = "Risk Index", y = "Frequency") +
+  theme_minimal()
 
 
 
 #### Chart 2 ####
-# Traffic Accidents Over Time
-traffic_data <- traffic_data %>%
-  mutate(report_date = as.Date(report_date, format = "%Y-%m-%d")) %>%
-  filter(!is.na(report_date))  # Remove rows with invalid dates
+# Risk Index by Road Conditions
+merged_data <- left_join(final_risk_data, traffic_data, by = "id")
 
-accidents_per_date <- traffic_data %>%
-  group_by(report_date) %>%
-  summarise(num_accidents = n())
-
-ggplot(accidents_per_date, aes(x = report_date, y = num_accidents)) +
-  geom_line(color = "darkred", linewidth = 1) +  # Updated to use 'linewidth'
-  labs(title = "Traffic Accidents Over Time", x = "Date", y = "Number of Accidents") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
+ggplot(merged_data, aes(x = road_conditions, y = risk_index, fill = road_conditions)) +
+  geom_violin(alpha = 0.7) +
+  scale_fill_brewer(palette = "Set3") +
+  labs(title = "Risk Index by Road Conditions", x = "Road Conditions", y = "Risk Index") +
+  theme_minimal()
 
 
 
 #### Chart 3 ####
-# Crime Hotspots (Latitude vs. Longitude)
-ggplot(crime_data, aes(x = longitude, y = latitude)) +
-  geom_point(color = "darkgrey", alpha = 0.5) +
-  labs(title = "Crime Hotspots", x = "Longitude", y = "Latitude") +
+# Temporal Trends: Theft by Hour of Day
+theft_by_hour <- theft_data %>%
+  group_by(hour) %>%
+  summarise(theft_count = n())
+
+ggplot(theft_by_hour, aes(x = hour, y = theft_count)) +
+  geom_line(color = "darkgrey", size = 1) +
+  labs(title = "Theft Count by Hour of Day", x = "Hour of Day", y = "Theft Count") +
   theme_minimal()
 
 
 
 #### Chart 4 ####
-# Injury Severity by Vehicle Type
-traffic_data <- traffic_data %>%
-  mutate(injury_factor = as.factor(injury))
+# Incidents Across Neighborhoods
+neighborhood_incidents <- traffic_data %>%
+  group_by(hood_158) %>%
+  summarise(incident_count = n())
 
-ggplot(traffic_data, aes(x = vehicle_type, fill = injury_factor)) +
-  geom_bar(position = "fill", color = "black", alpha = 0.7) +
-  scale_y_continuous(labels = scales::percent) +
-  labs(title = "Injury Severity by Vehicle Type", x = "Vehicle Type", y = "Proportion of Severity Levels") +
+ggplot(neighborhood_incidents, aes(x = reorder(hood_158, -incident_count), y = incident_count)) +
+  geom_bar(stat = "identity", fill = "lightgrey", color = "darkgrey", alpha = 0.7) +
+  labs(title = "Incidents Across Neighborhoods", x = "Neighborhood ID", y = "Incident Count") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
 #### Chart 5 ####
-# Traffic Accidents by Road Type
-ggplot(traffic_data, aes(x = road_type)) +
-  geom_bar(fill = "orange", color = "darkorange", alpha = 0.7) +
-  labs(title = "Traffic Accidents by Road Type", x = "Road Type", y = "Number of Accidents") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Risk Index by Lighting Conditions
+ggplot(merged_data, aes(x = lighting_conditions, y = risk_index, fill = lighting_conditions)) +
+  geom_violin(alpha = 0.7) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Risk Index by Lighting Conditions", x = "Lighting Conditions", y = "Risk Index") +
+  theme_minimal()
 
 
 
 #### Model 1 ####
-# Posterior Predictive Check for Traffic Model
-pp_check(traffic_model) +
-  ggtitle("Posterior Predictive Check for Traffic Model")
 
+# Text Summary of Risk Model
+summary(risk_model)
 
-
-#### Model 2 ####
-# Text Summary of Traffic Model
-summary(traffic_model)
