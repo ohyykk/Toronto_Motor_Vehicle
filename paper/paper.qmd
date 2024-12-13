@@ -322,7 +322,7 @@ Decisions surrounding motorbike ownership and usage carry significant implicatio
 
 This study introduces a composite risk score model to assess the risks associated with owning and riding a motorbike. Using data from Open Data Toronto, the model evaluates two critical events: motorbike theft and collisions. Logistic regression is employed to estimate the probabilities of motor collisions, and a theft index is calculated which are then combined with the likelihood of motor collisions into a single, interpretable composite risk score. This metric is designed to guide motorbike users, insurers, and policymakers in risk assessment and decision-making, while informing strategies to mitigate these risks.
 
-The primary estimand of the analysis is the composite risk score, derived from the individual probabilities of motorbike theft and collision. This score is calculated using predictor variables such as neighborhood characteristics, road and lighting conditions, time of day, and other contextual factors, which were selected for their documented relevance to motorbike-related risks.
+The **primary estimand** of the analysis is the composite risk score, derived from the individual probabilities of motorbike theft and collision. This score is calculated using predictor variables such as neighborhood characteristics, road and lighting conditions, time of day, and other contextual factors, which were selected for their documented relevance to motorbike-related risks.
 
 This analysis confirms and extends three key findings: (1) theft risks vary based on temporal factors, such as time of day and day of the week, with mornings exhibiting higher susceptibility to theft, while early mornings have lower theft risks; (2) Collision risks are strongly influenced by environmental and situational conditions, with risks being particularly high under poor visibility. Factors such as wet or icy road surfaces and inadequate traffic controls further significantly increase the likelihood of incidents; and (3) neighborhood characteristics play a critical role in shaping both theft and collision risks, with high-collision-risk neighborhoods primarily clustered in high-traffic zones and a notable concentration of collision incidents in downtown Toronto, reflecting the impact of dense urban environments and heavy traffic flows on risk levels.
 
@@ -1425,7 +1425,7 @@ ggplot(violin_data, aes(x = road_conditions, y = risk_index, fill = road_conditi
 ```{r}
 #| label: fig-risk-index-lighting-conditions
 #| fig-cap: "Risk Index by Lighting Conditions"
-#| fig-subcap: ["Low Light (Dark)", "Dawn Light", "Bright Daylight and Artificial Light", "Artificial Lighting Conditions"]
+#| fig-subcap: ["Dark Light Conditions", "Daylight Conditions", "Dawn Light", "Artificial Lighting Conditions"]
 #| echo: false
 #| warning: false
 #| message: false
@@ -1493,7 +1493,7 @@ plot_artificial
 
 @fig-risk-index-lighting-conditions presents the distribution of the Risk Index across four distinct lighting categories: Dark Conditions, Daylight Conditions, Dawn Conditions, and Artificial Lighting Conditions.
 
-Dark Conditions in @fig-risk-index-lighting-conditions-1 highlights a concentration of Risk Index values in the moderate-to-high range, indicating that low visibility during dark conditions significantly contributes to elevated collision risks. These findings underscore the importance of improved street lighting or reflective road markers in mitigating risks under dark conditions.
+Dark Light Conditions in @fig-risk-index-lighting-conditions-1 highlights a concentration of Risk Index values in the moderate-to-high range, indicating that low visibility during dark conditions significantly contributes to elevated collision risks. These findings underscore the importance of improved street lighting or reflective road markers in mitigating risks under dark conditions.
 
 Daylight Conditions distrubition in @fig-risk-index-lighting-conditions-2 shows a peak at slightly lower Risk Index values compared to dark conditions, reflecting the safety advantages of enhanced visibility. Daylight conditions reduce collision risks, likely due to clear visibility and the predictability of traffic patterns during the day.
 
@@ -1959,7 +1959,6 @@ Road visibility conditions, influenced by factors like fog, rain, or snow, are d
 
 The Time of Day is a key temporal variable that captures variations in collision risk throughout a 24-hour period. Collision likelihood often peaks during specific hours, such as morning and evening rush hours, due to increased traffic volume, or late at night, when factors like fatigue or impaired driving may come into play. Including this variable allows the model to account for temporal patterns in collision occurrences, supporting the implementation of time-specific measures, such as increased traffic enforcement during high-risk hours or adjustments to traffic light timings.
 
-\newpage
 
 # Idealized Methodology for a Survey on Motor Risk {#sec-survey}
 
@@ -1978,77 +1977,9 @@ Demographic characteristics: Age, gender, income, and education levels to captur
 Riding experience: Novice, intermediate, and experienced riders to assess how skill and familiarity influence risks.
 A sample size of approximately 1,000 respondents is proposed, distributed proportionally across the strata to ensure adequate representation for comparative analysis.
 
-## Survey structure and Content
+## Survey Structure and Content
 
-The survey is structured into six main sections, each designed to gather detailed information about factors influencing motorbike risks.
-
-**1. Demographics**
-
-This section collects essential background information to contextualize the respondent's behaviors and risks:
-
-- Age
-- Gender
-- Education level
-- Income range
-- Geographic location (urban, suburban, rural)
-- Motorbike ownership status
-
-**2. Motorbike Usage Patterns**
-
-Questions in this section aim to understand how respondents use their motorbikes:
-
-- Frequency of use (e.g., daily, weekly, monthly)
-- Primary purpose (e.g., commuting, recreation, delivery work)
-- Average trip duration
-- Type of roads frequently used (e.g., highways, city streets, rural roads)
-- Riding seasonality (e.g., year-round, summer-only)
-
-**3. Riding Behavior**
-
-This section looks into behaviors that may influence collision and theft risks:
-
-- Average speed during rides
-- Use of safety gear (e.g., helmets, gloves, reflective clothing)
-- Adherence to traffic laws (e.g., stopping at signals, avoiding speeding)
-- Riding under adverse conditions (e.g., rain, low light)
-- Group riding versus solo riding
-
-**4. Situational Risk Factors**
-
-This section explores external factors that contribute to motorbike risks:
-
-- Time of day most frequently ridden (morning, afternoon, night)
-- Common weather conditions experienced (e.g., sunny, rainy, foggy)
-- Road surface conditions during rides (e.g., dry, wet, icy)
-- Presence of traffic control measures on roads used
-- Experience with poorly lit or visibility-compromised areas
-
-**5. Risk Awareness and Experience**
-
-This section assesses respondents' awareness of risks and their personal experiences:
-
-- Perception of collision and theft risks in their area
-- Personal experience with motorbike theft (e.g., number of thefts, recovered cases)
-- Personal experience with collisions (e.g., frequency, severity, injuries sustained)
-- Awareness of high-risk areas for theft or collisions
-- Perception of environmental risks (e.g., poor road design, lack of lighting)
-
-**6. Preventive Measures and Interventions**
-
-This section investigates actions taken by riders to mitigate risks and their opinions on potential interventions:
-
-- Security measures used to prevent theft (e.g., locks, alarms, GPS trackers)
-- Riding adjustments to avoid collisions (e.g., avoiding high-risk areas, reducing     speed)
-- Willingness to participate in safety programs (e.g., high-level riding courses)
-  Opinions on public safety measures (e.g., improved lighting, better road   
-  infrastructure
-- Suggestions for reducing theft and collisions in their area
-
-
-### Question Types
-
-To ensure the survey collects meaningful, diverse, and actionable data, a combination of question types will be used. Each type serves a specific purpose, enabling both quantitative analysis and qualitative understanding. Below are the key question types included in the survey:
-
+Link to the survey: [Motorbike Safety and Risk Assessment Survey](https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAANAAWz9FNNUN1pHR0haWjJUSU1LTVlDVkFFVVVMQjJUTy4u)
 
 ### Questionnaire Design
 
@@ -2073,186 +2004,6 @@ Ranking questions require respondents to prioritize options based on their prefe
 5. Dichotomous Questions
 
 These questions have only two answer choices and are typically used to gather straightforward, binary data.
-
-6. Drop-Down Questions
-
-Drop-down questions are useful for limiting the display of options while allowing respondents to choose from a broad range of answers.
-
-7. Conditional/Follow-Up Questions
-
-Conditional questions are used to customize the survey based on previous responses, ensuring relevance and efficiency.
-
-#### Question List
-
-**Demographics**
-
-1. What is your age group?
-
-- Under 18
-
-- 18-24
-
-- 25-34
-
-- 35-44
-
-- 45-54
-
-- 55+
-
-2. What is your highest level of education?
-
-- High school or less
-
-- Some college or university
-
-- Bachelor’s degree
-
-- Master’s degree
-
-- Doctorate or professional degree
-
-**Motorbike Usage Patterns**
-
-3. How frequently do you use your motorbike?
-
-- Daily
-
-- Weekly
-
-- Monthly
-
-- Rarely
-
-- Other
-
-4. How important are the following reasons for riding a motorbike to you?
-
-- Commuting
-
-- Recreation
-
-- Delivery work
-
-- Other
-
-(Rank each reason: Not important at all, Slightly important, Moderately important, Very important, Extremely important)
-
-
-**Riding Behavior**
-
-5. How often do you wear a helmet while riding?
-
-- Never
-
-- Rarely
-
-- Sometimes
-
-- Often
-
-- Always
-
-6. What is your average speed while riding?
-
-- Below 40 km/h
-
-- 40-60 km/h
-
-- 60-80 km/h
-
-- Above 80 km/h
-
-**Situational Risk Factors**
-
-7. What time of day do you most often ride?
-
-- Morning (6 AM–12 PM)
-
-- Afternoon (12 PM–6 PM)
-
-- Night (6 PM–12 AM)
-
-- Early morning (12 AM–6 AM)
-
-8. How often do you encounter poor road visibility during rides?
-
-- Never
-
-- Rarely
-
-- Sometimes
-
-- Often
-
-**Risk Awareness and Experience**
-
-9. Have you ever had your motorbike stolen?
-
-- Yes 
-
-- No
-
-(If "Yes," follow-up: How many times has your motorbike been stolen?)
-
-- Once
-
-- 2-3 times
-
-- More than 3 times
-
-10. How would you rate the risk of collisions in your area?
-
-- Very low
-
-- Low
-
-- Moderate
-
-- High
-
-- Very high
-
-11. How important are the following factors for motorbike safety?
-
-- Helmet use
-
-- Speed limits
-
-- Visibility
-
-(Rate each factor: Not important at all, Slightly important, Moderately important, Very important, Extremely important)
-
-**Preventive Measures**
-
-12. What security measures do you currently use to prevent motorbike theft?
-(Select all that apply)
-
-- Locks
-
-- Alarms
-
-- GPS trackers
-
-- Other
-
-13. How effective do you think these changes would be in reducing motorbike collisions in your area?
-
-(Rate each factor: Not effective at all, Slightly effective, Moderately effective, Very effective, Extremely effective)
-
-- Improved road lighting
-
--Better road maintenance (e.g., fixing potholes, clearing debris)
-
-- Increased police patrols in high-risk areas
-
-- Public education on motorbike safety
-
-- Enforcing speed limits
-
-14. What changes do you think would most effectively reduce motorbike collisions in your area?
-(Open-ended)
-
 
 ## Recruitment Strategy
 
