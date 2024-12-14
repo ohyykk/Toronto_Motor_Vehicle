@@ -365,7 +365,7 @@ The outcome variable of this analysis is the Risk Index, a composite metric that
 #| fig-cap: "Distribution of the Overall Risk Index"
 #| fig-pos: H
 #| fig-width: 8 
-#| fig-height: 3.5 
+#| fig-height: 2.5 
 
 # Load necessary libraries
 library(tidyverse)
@@ -400,7 +400,7 @@ The skewness and spread of the distribution highlight the variability in the com
 #| fig-cap: "Risk Index Distribution by Risk Category"
 #| fig-pos: H
 #| fig-width: 8 
-#| fig-height: 3.5 
+#| fig-height: 2.7 
 
 # Load necessary libraries
 library(ggridges)
@@ -491,6 +491,7 @@ ggraph(tree_graph, layout = "dendrogram", circular = FALSE) +
   coord_flip()
 
 ```
+\newpage
 
 ### Theft index
 
@@ -506,6 +507,8 @@ The **Hour of the Day** variable is used as a predictor to analyze temporal tren
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-width: 8
+#| fig-height: 3.7
 # Load necessary libraries
 library(tidyverse)
 
@@ -534,18 +537,18 @@ ggplot(hour_summary, aes(x = hour, y = theft_count)) +
   )
 
 ```
+\newpage
 
 #### Day of the Week
 
 The **Day of the Week** variable is included as a predictor to analyze weekly trends in motorbike theft incidents. @fig-plot-day_summary visualizes the distribution of thefts across the week, revealing that incidents tend to peak on Monday and Tuesday, with slightly lower occurrences on weekends, particularly Saturday and Sunday. This predictor captures potential variations tied to weekly routines, such as higher theft risks during the start of the workweek when urban activity is higher, or reduced risks over the weekend when monitoring or exposure may change. By incorporating this variable, the model can better account for these temporal patterns, enhancing its ability to predict theft incidents based on the day of the week.
-\newpage 
 
 ```{r}
 #| label: fig-plot-day_summary
 #| fig-cap: "Theft Incidents by Day of the Week"
 #| echo: false
 #| fig-width: 8
-#| fig-height: 3
+#| fig-height: 2
 #| warning: false
 #| message: false
 
@@ -575,14 +578,14 @@ ggplot(day_summary, aes(x = day_of_week, y = theft_count)) +
 
 #### Premises Type
 
-The **Premises Type** variable is included as a predictor to examine the contextual environments where motorbike theft incidents are most prevalent. This variable categorizes thefts by location type, such as outdoor spaces, residential areas, or commercial properties, to identify settings associated with higher or lower risks. @fig-premises_summary highlights that outdoor locations account for the majority of thefts, followed by residential areas like houses and apartments, while locations such as educational and transit premises illustrates much lower incident counts. These patterns suggest that factors such as accessibility, lack of surveillance, and the density of parked motorbikes significantly influence theft risks across different premises types. Incorporating this variable allows the model to account for environmental factors, improving its ability to predict theft occurrences based on location characteristics.
+The **Premises Type** variable is included as a predictor to examine the contextual environments where motorbike theft incidents are most prevalent. This variable categorizes thefts by location type, such as outdoor spaces, residential areas, or commercial properties, to identify settings associated with higher or lower risks. @fig-premises_summary highlights that outdoor locations account for the majority of thefts, followed by residential areas like houses and apartments, while locations such as educational and transit premises illustrates much lower incident counts. These patterns suggest that factors such as accessibility, lack of surveillance, and the density of parked motorbikes significantly influence theft risks across different premises types.
 
 ```{r}
 #| label: fig-premises_summary
 #| fig-cap: "Theft Incidents by Day of the Week"
 #| echo: false
 #| fig-width: 8
-#| fig-height: 3
+#| fig-height: 2
 #| warning: false
 #| message: false
 
@@ -658,9 +661,7 @@ example_neighborhoods %>%
 
 #### Road Surface Condition
 
-The **Road Surface Condition** variable serves as a categorical predictor, detailing the state of the road at the time of an incident. Categories include dry, wet, loose snow, slush, ice, packed snow, and others. This variable enables the analysis to assess how different surface conditions contribute to motorbike collision risks.
-
-@fig-road_surface_summary illustrates the number of incidents under each road surface condition, showing that most incidents occur on dry roads, followed by wet roads. Conditions such as loose snow, ice, and packed snow account for a smaller proportion of incidents, reflecting their lower occurrence frequency. However, these different surface conditions may represent a disproportionately high risk per unit of exposure. This distribution underscores the importance of accounting for surface conditions in collision prevention strategies, especially during adverse weather, to enhance road safety and reduce risks.
+The **Road Surface Condition** variable serves as a categorical predictor, detailing the state of the road at the time of an incident. Categories include dry, wet, loose snow, slush, ice, packed snow, and others. This variable enables the analysis to assess how different surface conditions contribute to motorbike collision risks. @fig-road_surface_summary illustrates the number of incidents associated with different road surface conditions. Most incidents occur on dry roads, followed by wet roads, likely due to their higher frequency of use. In contrast, conditions such as loose snow, ice, and packed snow account for a smaller share of incidents, possibly because they occur less frequently. 
 
 ```{r}
 #| label: fig-road_surface_summary
@@ -669,7 +670,7 @@ The **Road Surface Condition** variable serves as a categorical predictor, detai
 #| warning: false
 #| message: false
 #| fig-width: 8
-#| fig-height: 3.5
+#| fig-height: 2.9
 
 
 # Summarize the number of incidents by road surface condition
@@ -702,8 +703,6 @@ The **Lighting Condition** variable is a categorical predictor that describes th
 
 @fig-lighting_summary illustrates that the majority of incidents occur during daylight hours, likely due to higher traffic volumes and activity levels during the day. Incidents under "Dark" and "Dark, artificial" conditions are less frequent but still significant, highlighting the increased risks associated with poor visibility. Transitional conditions like "Dawn" and "Dusk" contribute minimally to the total number of incidents. These findings emphasize the need for targeted safety measures, such as enhancing artificial lighting and promoting driver vigilance in low-visibility conditions, to reduce collision risks effectively.
 
-\newpage 
-
 ```{r}
 #| label: fig-lighting_summary
 #| fig-cap: "Incidents by Lighting Conditionk"
@@ -711,7 +710,7 @@ The **Lighting Condition** variable is a categorical predictor that describes th
 #| warning: false
 #| message: false
 #| fig-width: 8
-#| fig-height: 3.5
+#| fig-height: 2.7
 #| 
 # Combine "NA" with "Dawn, artificial" and summarize
 lighting_summary <- cleaned_traffic_data %>%
@@ -741,6 +740,8 @@ ggplot(lighting_summary, aes(x = reorder(lighting_conditions, -incident_count), 
 
 
 ```
+
+\newpage
 
 #### Traffic Control
 
@@ -1009,7 +1010,7 @@ where P represents the predicted probability of collision from the logistic regr
 #| fig-cap: "Logit Plot for Time of Day in the Collision Probability Model"
 #| fig-pos: H
 #| fig-width: 8
-#| fig-height: 3.5
+#| fig-height: 3
 
 # Load necessary libraries
 library(tidyverse)
@@ -1097,7 +1098,7 @@ The results of the VIF analysis for the collision risk model are presented in @t
 
 The slightly elevated VIF values can be attributed to a potential overlap in the information captured by Visibility Conditions and Road Conditions. For instance, poor visibility often coincides with adverse road conditions, such as wet or icy surfaces, leading to some degree of correlation between these variables.
 
-Despite this overlap, both predictors are retained in the model because they provide distinct and meaningful contributions to understanding collision risk. Visibility Conditions directly reflects environmental factors like fog, heavy rain, or low light, which impair drivers' ability to see hazards. Conversely, Road Conditions\` account for the physical state of the driving surface, such as wet, icy, or damaged roads, which influence vehicle handling and stopping distance. Together, these variables capture complementary aspects of collision risk, ensuring that the model provides a solid assessment.
+Despite this overlap, both predictors are retained in the model because they provide distinct and meaningful contributions to understanding collision risk. Visibility Conditions directly reflects environmental factors like fog, heavy rain, or low light, which impair drivers' ability to see hazards. Conversely, Road Conditions account for the physical state of the driving surface, such as wet, icy, or damaged roads, which influence vehicle handling and stopping distance. Together, these variables capture complementary aspects of collision risk, ensuring that the model provides a solid assessment.
 
 The inclusion of both variables aligns with the theoretical framework underpinning the model and enhances its practical utility by addressing multiple dimensions of risk. While some degree of multicollinearity is observed, its impact on model stability is minimal, and the predictors' theoretical importance justifies their inclusion.
 
@@ -1112,19 +1113,22 @@ The inclusion of both variables aligns with the theoretical framework underpinni
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "Risk Index by Time of Day, with bars showing Overall Risk Index, the red line showing Collision Risk, and green dots showing Theft Risk."
+#| fig-cap: "Risk Index by Time of Day, with bars showing Overall Risk Index, the red line showing average Collision Risk, and green dots showing average Theft Risk."
 #| fig-pos: H
 #| fig-width: 8
 #| fig-height: 4
 
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)
+
 # Load necessary data
 final_risk_data <- read_csv(here("data", "02-analysis_data", "final_risk_index.csv"))
-
 cleaned_traffic_data <- read_csv(here("data", "02-analysis_data", "cleaned_traffic_data.csv"))
-
 collision_risk_scores <- read_csv(here("data", "02-analysis_data", "collision_risk_scores.csv"))
 
-# Convert 'id' to character in both datasets if necessary
+# Convert 'id' to character in all datasets if necessary
 final_risk_data$id <- as.character(final_risk_data$id)
 cleaned_traffic_data$id <- as.character(cleaned_traffic_data$id)
 collision_risk_scores$id <- as.character(collision_risk_scores$id)
@@ -1135,21 +1139,23 @@ merged_data <- left_join(final_risk_data, cleaned_traffic_data, by = "id")
 # Merge the collision risk scores into the merged data
 merged_data <- left_join(merged_data, collision_risk_scores, by = "id")
 
-# Create 'time_of_day_bin' based on 'time_of_day' in cleaned_traffic_data
-merged_data$time_of_day_bin <- case_when(
-  merged_data$time_of_day >= 0 & merged_data$time_of_day < 600 ~ "Early Morning",
-  merged_data$time_of_day >= 600 & merged_data$time_of_day < 1200 ~ "Morning",
-  merged_data$time_of_day >= 1200 & merged_data$time_of_day < 1800 ~ "Afternoon",
-  merged_data$time_of_day >= 1800 & merged_data$time_of_day < 2400 ~ "Evening"
-)
+# Create 'time_of_day_bin' based on 'time_of_day'
+merged_data <- merged_data %>%
+  mutate(
+    time_of_day_bin = case_when(
+      time_of_day >= 0 & time_of_day < 600 ~ "Early Morning",
+      time_of_day >= 600 & time_of_day < 1200 ~ "Morning",
+      time_of_day >= 1200 & time_of_day < 1800 ~ "Afternoon",
+      time_of_day >= 1800 & time_of_day < 2400 ~ "Evening"
+    )
+  )
 
 # Group by 'time_of_day_bin' and calculate average values for risk index and collision index
 summary_data <- merged_data %>%
   group_by(time_of_day_bin) %>%
   summarize(
     avg_risk_index = mean(risk_index, na.rm = TRUE),
-    avg_collision_index = mean(collision_probability
-, na.rm = TRUE)
+    avg_collision_index = mean(collision_probability, na.rm = TRUE)
   )
 
 # Theft hour indexes (24-hour data points)
@@ -1183,21 +1189,45 @@ final_plot_data <- left_join(summary_data, theft_summary_data, by = "time_of_day
 # Plot: Risk Index, Collision Index, and Theft Hour Index by Time of Day Bin
 ggplot(final_plot_data, aes(x = time_of_day_bin)) +
   geom_bar(aes(y = avg_risk_index), stat = "identity", fill = "#967145") +
-  geom_line(aes(y = avg_collision_index), group = 1, color = "darkred", size = 1) + # Collision index line
+  geom_line(aes(y = avg_collision_index, group = 1), color = "darkred", size = 1) + # Collision index line
   geom_text(aes(y = avg_risk_index, label = round(avg_risk_index, 2)), vjust = -0.5) +  # Add labels for risk index
   geom_text(aes(y = avg_collision_index, label = round(avg_collision_index, 2)), vjust = 1.5, color = "black") +  # Add labels for collision index
-  geom_line(aes(y = avg_theft_index * 10), color = "green", size = 1, linetype = "dashed") +  # Theft index line (scaled by 100)
+  geom_line(aes(y = avg_theft_index * 10), color = "green", size = 1, linetype = "dashed") +  # Theft index line (scaled by 10)
   geom_point(aes(y = avg_theft_index * 10), color = "green", size = 2) +  # Theft index points
+  # Label for Collision Risk
+  geom_label(
+    data = data.frame(
+      time_of_day_bin = "Evening", 
+      y = max(final_plot_data$avg_collision_index, na.rm = TRUE) * 1.05
+    ),
+    aes(x = time_of_day_bin, y = y, label = "Average Collision Risk"),
+    inherit.aes = FALSE,
+    fill = "pink",
+    alpha = 0.3,
+    color = "darkred",
+    size = 3,
+    label.size = 0
+  ) +
+  # Label for Theft Risk (adjusted position to the right)
+  geom_label(
+    data = data.frame(
+      time_of_day_bin = "Morning", 
+      y = final_plot_data$avg_theft_index[final_plot_data$time_of_day_bin == "Morning"] * 10 + 0.1
+    ),
+    aes(x = time_of_day_bin, y = y, label = "Average Theft Risk"),
+    inherit.aes = FALSE,
+    fill = "lightgreen",
+    alpha = 0.3,
+    color = "green",
+    size = 3,
+    label.size = 0,
+    hjust = 0.5  # Adjust horizontal alignment slightly
+  ) +
   labs(
-    
     x = "Time of Day",
     y = "Average Risk Index"
   ) +
   theme_minimal()
-
-
-
-
 
 ```
 
@@ -1207,7 +1237,7 @@ The highest overall Risk Index is observed in the Morning bin, driven by elevate
 
 ### Time Series Analysis
 
-This time series analysis explores how the Risk Index evolves over time, offering a long-term view across the years and a more focused examination of a specific year. By visualizing these temporal trends, we can reveal potential seasonal effects, fluctuations, and patterns that might not be immediately apparent in a snapshot of data. The following section presents the trends in the Risk Index over both the full timespan (2006-2021) and the specific year 2020.
+This time series analysis explores how the Risk Index evolves over time, offering a long-term view across the years and a more focused examination of the year 2020 during covid outbreaks. By visualizing these temporal trends, we can reveal potential seasonal effects, fluctuations, and patterns that might not be immediately apparent in a snapshot of data. The following section presents the trends in the Risk Index over both the full timespan (2006-2021) and the year 2020.
 
 #### Longterm
 
@@ -1218,12 +1248,13 @@ This time series analysis explores how the Risk Index evolves over time, offerin
 #| message: false
 #| fig-cap: "Long-Term Temporal Trends in Risk Index (Mid-2016 to Mid-2024) with Rolling Average"
 #| fig-pos: H
-#| fig-width: 8
+#| fig-width: 9
 #| fig-height: 3.5
 
 # Load necessary libraries
 library(tidyverse)
 library(lubridate)
+library(zoo)
 library(here)
 
 # Load the cleaned traffic data
@@ -1236,26 +1267,35 @@ if (!"risk_index" %in% colnames(cleaned_traffic_data)) {
     left_join(final_risk_data, by = "id")
 }
 
-# Convert `date` to Date format if not already
+# Convert `report_date` to Date format
 cleaned_traffic_data <- cleaned_traffic_data %>%
   mutate(date = as.Date(report_date))
 
-# Aggregate data by date to calculate the average Risk Index
+# Aggregate data by month to calculate the average Risk Index
 risk_trends <- cleaned_traffic_data %>%
-  group_by(date) %>%
-  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE))
-
-# Create a 6-month rolling average for clearer trend
-risk_trends <- risk_trends %>%
-  arrange(date) %>%
-  mutate(rolling_avg = zoo::rollmean(avg_risk_index, 6, fill = NA, align = "center"))
+  mutate(month = floor_date(date, unit = "month")) %>%  # Aggregate at the monthly level
+  group_by(month) %>%
+  summarize(avg_risk_index = mean(risk_index, na.rm = TRUE)) %>%
+  arrange(month) %>%
+  mutate(rolling_avg = zoo::rollmean(avg_risk_index, 6, fill = NA, align = "center"))  # 6-month rolling average
 
 # Create the time series plot for the entire period
-ggplot(risk_trends, aes(x = date, y = avg_risk_index)) +
-  geom_line(color = "#967145", size = 1, alpha = 0.7) +
-  geom_line(aes(x = date, y = rolling_avg), color = "grey", size = 1, linetype = "dashed") +
+ggplot(risk_trends, aes(x = month, y = avg_risk_index)) +
+  geom_line(color = "#967145", size = 1, alpha = 0.7) +  # Original average trend
+  geom_line(aes(y = rolling_avg), color = "red", size = 1, linetype = "dashed") +  # Rolling average
+  # Add annotation for the six-month rolling average
+  annotate(
+    "label", 
+    x = as.Date("2022-06-01"),  # Adjust to place the label inside the plot area
+    y = 0.6,  # Place it at a visible y-coordinate
+    label = "Six-Month Rolling Average", 
+    color = "red", 
+    fill = "lightpink", 
+    alpha = 0.4, 
+    size = 4, 
+    label.size = 0
+  ) +
   labs(
-    
     x = "Year",
     y = "Average Risk Index"
   ) +
@@ -1263,18 +1303,21 @@ ggplot(risk_trends, aes(x = date, y = avg_risk_index)) +
     date_breaks = "2 years", 
     date_labels = "%Y"
   ) +
+  scale_y_continuous(
+    limits = c(0.52, 0.62),  # Ensure the label fits within the y-axis range
+    breaks = seq(0.52, 0.62, by = 0.02)
+  ) +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
     axis.title = element_text(size = 12)
   )
 
-
 ```
 
-@fig-risk-index-timeseries-longterm illustrates the long-term temporal trends in the Average Risk Index, measured daily and visualized from mid 2006 to mid 2023. The solid line represents the daily Average Risk Index, while the grey dashed line shows a six-month rolling average, providing a smoothed representation of the underlying trends.
+@fig-risk-index-timeseries-longterm depicts the long-term trends in the Average Risk Index, measured daily and displayed from mid-2006 to mid-2023. The brown solid line represents the daily Average Risk Index, while the red dashed line illustrates a six-month rolling average, providing a smoother depiction of overall patterns.
 
-The daily Average Risk Index illustrates considerable variability, reflecting fluctuations in risk factors such as collision and theft incidents over time. These short-term variations may be influenced by factors like weather conditions, traffic density, or seasonal changes. In contrast, the rolling average highlights more stable, long-term patterns, suggesting relatively stable long-term trends in the Risk Index, with no sudden increases or decreases over the years. However, several periodic dips and peaks in late 2016 and mid 2018 underscore the importance of addressing short-term change in risk to enhance overall safety. 
+The daily Average Risk Index fluctuates significantly, reflecting changes in factors such as collision and theft occurrences over time. These short-term variations could be associated with seasonal patterns, weather changes, or traffic conditions. Meanwhile, the rolling average highlights broader, more consistent patterns, indicating stable long-term trends without dramatic increases or decreases. Periodic dips and peaks, such as those observed in late 2016 and mid-2018, emphasize the importance of addressing temporary shifts in risk to support safer conditions.
 
 #### Covid Period
 
@@ -1419,7 +1462,6 @@ ggplot(violin_data, aes(x = road_conditions, y = risk_index, fill = road_conditi
 ```
 
 @fig-risk-distribution-roadcondition highlights notable differences in the Risk Index distribution across various road surface conditions. Wet and icy conditions, in particular, show higher variability in the Risk Index, suggesting that these surfaces may lead to more unpredictable and elevated risk levels. Dry conditions, on the other hand, generally exhibit a lower and more consistent risk. These findings highlight the significant impact that road surface conditions can have on traffic-related risks, underscoring the importance of considering these factors in risk management and safety measures.
-\newpage
 
 
 ```{r}
@@ -1576,20 +1618,18 @@ ggplot(data, aes(x = collision_probability, color = risk_group, fill = risk_grou
 # Load necessary libraries
 library(sf)
 library(ggplot2)
-
 library(osmdata)
 library(dplyr)
 
 # Load the GeoJSON file
 collision_data <- st_read(here("data", "02-analysis_data", "collision.geojson"), quiet = TRUE)
 
-
 # Add a column to classify top 15 neighborhoods
 top_15_hoods <- c(173, 88, 29, 61, 89, 84, 153, 53, 79, 157, 150, 12, 108, 143, 98)
 collision_data <- collision_data %>%
   mutate(
-  is_top_15 = ifelse(as.numeric(HOOD_158) %in% top_15_hoods, "High Collision Risk Neighborhoods", "Others")
-)
+    is_top_15 = ifelse(as.numeric(HOOD_158) %in% top_15_hoods, "High Collision Risk Neighborhoods", "Others")
+  )
 
 # Get a basemap of Toronto from OpenStreetMap
 toronto_bbox <- c(-79.6393, 43.5810, -79.1151, 43.8555)  # Toronto bounding box
@@ -1612,6 +1652,24 @@ ggplot() +
   # Add collision points with classification
   geom_sf(data = collision_data, aes(color = is_top_15), size = 0.5, alpha = 0.6) +
   scale_color_manual(values = c("High Collision Risk Neighborhoods" = "red", "Others" = "yellow")) +
+  # Add the arrow with adjusted position
+  geom_segment(
+    aes(x = -79.38, y = 43.61, xend = -79.38, yend = 43.63),  # Move arrow to the right
+    arrow = arrow(length = unit(0.2, "cm")),
+    color = "#363231"
+  ) +
+  # Add the label with adjusted position
+  annotate(
+    "label",
+    x = -79.38,  # Move label to the right
+    y = 43.60,
+    label = "Downtown Area",
+    fill = "lightgrey",
+    color = "#363231",
+    alpha = 0.7,
+    size = 4,
+    label.size = 0
+  ) +
   labs(
     x = "Longitude",
     y = "Latitude",
@@ -1701,6 +1759,8 @@ Qualitative research with residents and stakeholders in high-risk neighborhoods 
 \appendix
 
 # Appendix {.unnumbered}
+
+# Shiny Application
 
 # Additional Data Details {#sec-data_details}
 
@@ -1910,54 +1970,6 @@ cleaned_data_example %>%
   column_spec(2, width = "20em")  # Adjust width for better text wrapping
 
 ```
-
-## Predictor Variable Choice 
-
-### Theft Index
-
-In constructing the theft risk sub-indexes, the choice of predictor variables: Hour of the Day, Day of the Week, and Premises Type was informed by both theoretical and practical considerations rooted in spatial, temporal, and environmental factors associated with theft incidents. These variables were selected from the cleaned theft dataset to create a strong and interpretable model that captures key patterns of theft occurrences while aligning with the study's goal of identifying targeted interventions.
-
-1. Hour of the Day
-
-The inclusion of the Hour of the Day as a predictor variable reflects the strong temporal dependency of theft occurrences. Theft risk often varies significantly across a 24-hour period due to human activity patterns, such as peak commuting times, work hours, and late-night inactivity. For example, motor vehicle thefts are more likely to occur during nighttime hours when there is reduced surveillance and fewer bystanders to deter criminal behavior. By incorporating the Hour of the Day into the theft risk sub-index, the model accounts for this temporal dimension, enabling stakeholders to identify high-risk hours and implement time-specific interventions, such as increased nighttime patrols or surveillance in parking lots and residential areas.
-
-2. Day of the Week
-
-The Day of the Week was selected to capture the variations in theft risk across different days, which often reflect behavioral patterns linked to work, leisure, and mobility. Weekends, for instance, may see heightened theft activity in areas with nightlife or during events that attract large crowds, while weekdays might exhibit theft patterns associated with commuter parking zones or commercial districts. The inclusion of this variable allows the model to identify day-specific risks and tailor interventions, such as targeted surveillance during high-risk days or public awareness campaigns about theft prevention.
-
-3. Premises Type
-
-Premises Type represents the spatial dimension of theft risk, capturing the environmental characteristics where thefts are most likely to occur. For example, thefts in residential areas (e.g., houses, apartments) often occur when vehicles are parked in driveways or on the street with limited security measures. Similarly, commercial areas and outdoor public spaces may pose unique risks due to their high foot traffic, limited oversight during certain hours, or accessibility of parked vehicles. Including Premises Type in the sub-index allows the model to differentiate risk levels based on spatial characteristics and recommend location-specific strategies, such as installing better lighting in outdoor parking areas or promoting secure storage options for residential settings.
-
-
-### Collision Probability
-
-The predictors chosen for the logistic regression model were carefully selected to capture key spatial, temporal, and environmental factors that influence the likelihood of severe collisions. These variables were derived from the cleaned collision dataset, ensuring data quality and relevance to the study's focus on urban mobility and safety in Toronto.
-
-1. Neighborhood ID 
-
-The inclusion of hood_158, a unique identifier for neighborhoods, allows the model to capture spatial patterns in collision occurrences. Different neighborhoods may exhibit varying levels of collision risk due to factors such as traffic density, road design, infrastructure quality, and socioeconomic conditions. By including this variable, the model can account for geographic heterogeneity, identifying high-risk areas and enabling targeted interventions such as infrastructure improvements or traffic calming measures in specific neighborhoods.
-
-2. Road Surface Condition 
-
-Road surface conditions, such as dry, wet, or icy surfaces, significantly impact vehicle control and braking effectiveness, making this variable a critical predictor. Collisions are more likely under adverse surface conditions, such as rain, snow, or ice, due to reduced traction and visibility. Including this variable in the model ensures that environmental factors influencing vehicle dynamics are accounted for, providing insights into how weather and road maintenance contribute to collision risk. This information can guide policies such as improved road drainage systems or timely snow and ice removal.
-
-3. Lighting Condition 
-
-Lighting conditions, which describe whether collisions occur during daylight, nighttime, or under artificial light, are essential for understanding the role of visibility in collisions. Poor lighting can reduce drivers' ability to perceive hazards, increasing the likelihood of accidents. By incorporating this variable, the model can assess how lighting contributes to collision risk, highlighting the importance of enhanced street lighting in poorly lit areas or during nighttime hours.
-\newpage
-
-4. Traffic Control 
-
-The presence and type of traffic control devices, such as stop signs, traffic signals, and pedestrian crossovers, play a important role in preventing collisions by regulating vehicle flow and ensuring predictable driver behavior. The inclusion of this variable allows the model to evaluate the effectiveness of existing traffic control measures and identify gaps, such as intersections without adequate control devices, where collisions are more likely to occur. This idea can inform infrastructure upgrades and the installation of additional traffic management systems.
-
-5. Road Visibility 
-
-Road visibility conditions, influenced by factors like fog, rain, or snow, are directly linked to drivers' ability to perceive their surroundings and react to potential hazards. Poor visibility increases the risk of collisions by reducing reaction time and decision-making effectiveness. Including this variable ensures that the model captures the impact of adverse weather and environmental conditions on collision likelihood, emphasizing the need for weather-responsive traffic management strategies, such as variable speed limits or enhanced signage.
-
-6. Time of Day
-
-The Time of Day is a key temporal variable that captures variations in collision risk throughout a 24-hour period. Collision likelihood often peaks during specific hours, such as morning and evening rush hours, due to increased traffic volume, or late at night, when factors like fatigue or impaired driving may come into play. Including this variable allows the model to account for temporal patterns in collision occurrences, supporting the implementation of time-specific measures, such as increased traffic enforcement during high-risk hours or adjustments to traffic light timings.
 
 
 # Idealized Methodology for a Survey on Motor Risk {#sec-survey}
