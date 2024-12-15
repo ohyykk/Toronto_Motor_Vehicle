@@ -5,7 +5,7 @@ account: ohyykk
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13599075
-bundleId: 9521476
+bundleId: 9521546
 url: https://ohyykk.shinyapps.io/TorontoMotorVehicle/
 version: 1
 asMultiple: FALSE

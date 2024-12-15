@@ -109,22 +109,37 @@ ui <- fluidPage(
 # Define server
 server <- function(input, output, session) {
   
-  # Create filtered reactive dataset
+  # Create filtered reactive dataset with error handling
   filtered_data <- reactive({
+    req(input$risk_range)  # Ensure risk range input exists
+    
     data <- merged_data
     
+    # Handle neighborhood selection with validation
     if (!is.null(input$neighborhood) && length(input$neighborhood) > 0) {
-      data <- data[data$NEIGHBOURHOOD_158 %in% input$neighborhood, ]
+      data <- data %>%
+        filter(NEIGHBOURHOOD_158 %in% input$neighborhood)
+      
+      # Validate that we have data after filtering
+      if (nrow(data) == 0) {
+        return(merged_data)  # Return all data if filter results in empty set
+      }
     }
     
-    data <- data[data$risk_index >= input$risk_range[1] & 
-                 data$risk_index <= input$risk_range[2], ]
+    # Filter by risk range with validation
+    data <- data %>%
+      filter(risk_index >= input$risk_range[1],
+             risk_index <= input$risk_range[2])
     
     return(data)
   })
   
-  # Create the map
+  # Create the map with error handling
   output$riskMap <- renderLeaflet({
+    # Validate that we have data to show
+    data <- filtered_data()
+    req(nrow(data) > 0)  # Ensure we have data
+    
     # Create color palette
     pal <- colorNumeric(
       palette = "YlOrRd",
@@ -132,13 +147,12 @@ server <- function(input, output, session) {
     )
     
     # Get coordinates for filtered data
-    data <- filtered_data()
     coords <- st_coordinates(data)
     
     # Create base map
     leaflet(data) %>%
       addTiles() %>%
-      setView(lng = -79.3832, lat = 43.6532, zoom = 11) %>%  # Toronto coordinates
+      setView(lng = -79.3832, lat = 43.6532, zoom = 11) %>%
       addCircleMarkers(
         lng = coords[,1],
         lat = coords[,2],
