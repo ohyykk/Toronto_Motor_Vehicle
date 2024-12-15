@@ -355,7 +355,7 @@ Additional details about the dataset are available in the [datasheet](https://gi
 
 ## Outcome Variables
 
-The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.The Risk Index integrates two underlying components: the theft component, derived from proportional sub-indexes for temporal and spatial factors, and the collision probability, estimated using a logistic regression model. By combining these elements, the Risk Index provides a unified measure of risk, enabling the identification of high-risk scenarios and areas. 
+The outcome variable of this analysis is the Risk Index, a composite metric that integrates the probabilities of two underlying events: theft and collision.The Risk Index integrates two underlying components: the theft component, derived from proportional sub-indexes for temporal and spatial factors, and the collision probability, estimated using a logistic regression model. By combining these elements, the Risk Index provides a unified measure of risk, enabling the identification of high-risk scenarios and areas. An interactive visualization of the final risk index can be found in [Appendix -@sec-shiny].
 
 ```{r}
 #| label: fig-risk-index-histogram
@@ -1760,7 +1760,9 @@ Qualitative research with residents and stakeholders in high-risk neighborhoods 
 
 # Appendix {.unnumbered}
 
-# Shiny Application
+# Shiny Application {#sec-shiny}
+
+The Risk Index by neighborhood can be visualized [here](https://ohyykk.shinyapps.io/TorontoMotorVehicle/)
 
 # Additional Data Details {#sec-data_details}
 
