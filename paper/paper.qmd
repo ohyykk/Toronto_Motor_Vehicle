@@ -1,5 +1,5 @@
 ---
-title: "When Risk Hits the Road: Does Danger Drive a Return?"
+title: "Motor Vehicle Risks in Toronto: Uncovering Collision and Theft Patterns"
 subtitle: "Risk Peaks in the Morning on Dark, Snow-Packed Roads and in High Urban Density Areas"
 author: 
   - Yingke He
