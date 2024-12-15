@@ -935,13 +935,15 @@ w_1 = 0.7, \quad w_2 = 0.3
 
 ## Model Justification
 
-The analysis adopts a hybrid approach that combines sub-index calculations for theft risk with logistic regression for collision probability. This design ensures that the model reflects the specific data characteristics and practical considerations when assessing motorbike-related risks. Logistic regression is not utilized for theft risk due to the absence of negative (non-theft) cases in the dataset. Instead, theft risk is represented through sub-index calculations for three critical factors: hour of the day, day of the week, and premises type. Each factor contributes equally to the total theft component. The Hour of the Day Index captures temporal variations in theft risk across 24 hours, while the Day of the Week Index accounts for weekly patterns of theft. The Premises Type Index reflects variations in risk based on location type, such as houses, outdoor spaces, or commercial premises. These sub-indexes are normalized so their contributions to the theft component are proportional and balanced. This approach ensures an accurate representation of theft risk patterns while providing actionable insights into temporal and spatial risk factors.
+The analysis adopts a hybrid approach that combines sub-index calculations for theft risk with logistic regression for collision probability. This design ensures that the model reflects the specific data characteristics and practical considerations when assessing motorbike-related risks. Logistic regression is **not utilized** for theft risk due to the absence of negative (non-theft) cases in the dataset. Instead, theft risk is represented through sub-index calculations for three critical factors: hour of the day, day of the week, and premises type. Each factor contributes equally to the total theft component. The Hour of the Day Index captures temporal variations in theft risk across 24 hours, while the Day of the Week Index accounts for weekly patterns of theft. The Premises Type Index reflects variations in risk based on location type, such as houses, outdoor spaces, or commercial premises. These sub-indexes are normalized so their contributions to the theft component are proportional and balanced. This approach ensures an accurate representation of theft risk patterns while providing actionable insights into temporal and spatial risk factors.
 
 For collision risk, the model utilizes logistic regression due to its effectiveness in estimating probabilities for binary outcomes. The log-odds of collision probability are modeled as a function of neighborhood-specific characteristics, road surface conditions, lighting conditions, and traffic control measures. By including these predictors, the model accounts for diverse factors that influence collision risks. Logistic regression’s ability to handle both categorical and continuous variables makes it an appropriate choice for this component, delivering statistically reliable estimates and facilitating the interpretation of individual predictors’ effects.
 
-The final Risk Index integrates the theft and collision components using a weighted formula. The collision probability component is weighted at 0.7, reflecting its higher immediate impact on safety, while the theft component is weighted at 0.3. This weighting scheme prioritizes collision risk while ensuring that theft risk is not overlooked. By combining these components, the Risk Index provides a unified measure of motorbike-related risks, enabling stakeholders to assess and compare safety conditions across different contexts.
+The final Risk Index integrates the theft and collision components using a weighted scheme of 0.3 for theft and 0.7 for collision, emphasizing collision risk while ensuring theft risk is considered. By combining these components, the Risk Index offers a unified measure of motorbike-related risks, enabling stakeholders to evaluate and compare safety conditions across different contexts.
 
-This modeling approach is justified by its ability to adapt to the data’s constraints while maintaining statistical rigor and interpretability. The sub-index method for theft risk is tailored to the dataset’s characteristics, avoiding assumptions about unobserved cases, and the use of logistic regression for collision risk ensures robust and reliable predictions. Together, these components form a practical and practical framework for evaluating motorbike ownership and usage risks, addressing both immediate safety concerns and long-term theft risks.
+The model assumes independence between theft and collision risks and relies on proportional theft representations, which may limit its ability to capture interactions or account for unmeasured confounders. **Alternative methods** like generalized additive models or machine learning techniques could address these limitations but were not used to prioritize interpretability and simplicity. 
+
+This modeling approach is justified by its ability to adapt to the data’s constraints while maintaining statistical rigor and interpretability. The sub-index approach for theft risk is designed to align with the characteristics of the dataset, avoiding assumptions about unobserved cases, and the use of logistic regression for collision risk ensures solid and reliable predictions. Together, these components form a practical framework for evaluating motorbike ownership and usage risks, addressing both immediate safety concerns and long-term theft risks.
 
 ## Model Assumptions and Validations
 
@@ -959,7 +961,7 @@ $$
 w_1 \text{ and } w_2
 $$
 
-to evaluate the robustness and reliability of the final Risk Index.
+to evaluate the reliability of the final Risk Index.
 
 
 ### Collision Model
@@ -984,7 +986,7 @@ The logistic regression model does not directly predict 1 or 0. Instead, it prov
 
 #### Independence of Observations
 
-The collision model assumes that each observation is independent of the others, a fundamental requirement for logistic regression. This assumption is satisfied in the dataset, as each row represents a distinct and independently reported collision incident. The observations are not repeated or correlated, ensuring that the logistic regression model provides unbiased estimates of the relationships between predictor variables and the response variable. By meeting this assumption, the collision model maintains its validity for estimating probabilities of severe collisions and contributes robustly to the composite Risk Index.
+The collision model assumes that each observation is independent of the others, a fundamental requirement for logistic regression. This assumption is satisfied in the dataset, as each row represents a distinct and independently reported collision incident. The observations are not repeated or correlated, ensuring that the logistic regression model provides unbiased estimates of the relationships between predictor variables and the response variable. By meeting this assumption, the collision model remains valid for estimating probabilities of severe collisions and provides a reliable contribution to the composite Risk Index.
 
 #### Linear Relationship in the Log-Odds
 
