@@ -16,18 +16,18 @@ The repository is organized as follows:
   - Bibliography and citation files
 - `scripts`: Includes the R code for data simulating, cleaning, analysis, and visualization
 - `other/datasheet`: Contains the detailed datasheet for the collision and theft dataset
-- `other/llm`: Contains record of various conversations with ChatGPT that contributed to the development of this motor risk project
-- `other/sketches`: Rreviews of the charts and models included in the final research paper
+- `other/llm`: Contains record of various conversations with ChatGPT that contributed to the development of this paper
+- `other/sketches`: Includes drafts of the charts and models featured in the final research paper
 - `other/shiny`: Include files used for the [shiny app](https://ohyykk.shinyapps.io/TorontoMotorVehicle/)
 
 ## Tools and Methodology
 
 The analysis involves:
-1. **Geospatial Analysis**:  Mapping motorbike theft and collision risks across Toronto and overlaying neighborhood characteristics 
+1. **Geospatial Analysis**:  Mapping motorbike theft and collision risks across Toronto while incorporating neighborhood characteristics
 
-2. **Statistical Modeling**: Using a logistic regression model to examine the relationships between collision risks, environmental conditions, and temporal factors
+2. **Statistical Modeling**: Employing a logistic regression model to analyze the relationships between collision risks, environmental factors, and temporal variables
   
-4. **Visualization**: Static plots are used to illustrate key findings and highlight spatial and temporal patterns
+4. **Visualization**: Static plots are utilized to present key findings and emphasize statistical and temporal trends.
 
 Software tools used include:
 - **R**: For statistical modeling, data manipulation, and visualizations (e.g., `ggplot2`).
