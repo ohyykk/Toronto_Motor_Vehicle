@@ -26,7 +26,7 @@ All the following questions are extracted from @gebru2021datasheets.
 3.  *Who funded the creation of the dataset? If there is an associated grant, please provide the name of the grantor and the grant name and number.*
     -   The funding for the dataset's creation likely stems from the operating budget of the Toronto Police Service, supported by the City of Toronto. There is no specific mention of external grants or funding in the documentation, suggesting that it is a part of their routine operational and public outreach activities.
 4.  *Any other comments?*
-    -   The datasets serve as critical tools for urban planning, public safety strategies, and academic research. However, users should note the limitations of the dataset, including potential discrepancies due to privacy adjustments and the lack of guarantees for completeness or timeliness. The initiative reflects broader efforts to leverage open data for improving community outcomes and fostering collaborative problem-solving.
+    -   The datasets serve as important tools for urban planning, public safety strategies, and academic research. However, users should note the limitations of the dataset, including potential discrepancies due to privacy adjustments and the lack of guarantees for completeness or timeliness. The initiative reflects broader efforts to utilize open data to enhance community outcomes and promote collaborative problem-solving.
 
 
 # Composition
@@ -62,7 +62,7 @@ All the following questions are extracted from @gebru2021datasheets.
 15. *Does the dataset contain data that might be considered sensitive in any way (for example, data that reveals race or ethnic origins, sexual orientations, religious beliefs, political opinions or union memberships, or locations; financial or health data; biometric or genetic data; forms of government identification, such as social security numbers; criminal history)? If so, please provide a description.*
     -   The dataset includes potentially sensitive information, such as geographic locations of incidents, which could reveal patterns related to crime or traffic safety in specific areas. While no direct identifiers are present, the nature of the data—especially involving fatalities or serious injuries—could be considered sensitive due to its implications for public safety and community well-being.
 16. *Any other comments?*
-    -   The dataset serves as an invaluable resource for public safety analysis and urban planning, but users must approach it with care, especially regarding privacy and ethical considerations. While efforts have been made to anonymize and adjust sensitive information, the potential for misuse underscores the importance of responsible data handling and interpretation.
+    -   The dataset serves as an important resource for public safety analysis and urban planning, but users must approach it with care, especially regarding privacy and ethical considerations. While efforts have been made to anonymize and adjust sensitive information, the potential for misuse underscores the importance of responsible data handling and interpretation.
 
 # Collection process
 
@@ -72,7 +72,7 @@ All the following questions are extracted from @gebru2021datasheets.
     -   Data collection relied on manual reporting by law enforcement officers, public submissions (e.g., online forms or emergency calls), and administrative data entry systems used by the Toronto Police Service. These mechanisms are part of standard law enforcement operations, which are typically validated through internal quality assurance processes, though specific details about validation are not provided.
 
 3.  *If the dataset is a sample from a larger set, what was the sampling strategy (for example, deterministic, probabilistic with specific sampling probabilities)?*
-    -   The dataset is a comprehensive sample of reported incidents rather than a probabilistic or random sample. It includes all documented collisions and thefts meeting specific criteria (e.g., collisions resulting in fatalities or serious injuries). However, unreported incidents are excluded, meaning the dataset represents only the subset of events known to law enforcement.
+    -   The dataset represents an extensive collection of reported incidents rather than a probabilistic or random sample. It includes all documented collisions and thefts meeting specific criteria (e.g., collisions resulting in fatalities or serious injuries). However, unreported incidents are excluded, meaning the dataset represents only the subset of events known to law enforcement.
 4.  *Who was involved in the data collection process (for example, students, crowdworkers, contractors) and how were they compensated (for example, how much were crowdworkers paid)?*
     -   Data collection was conducted by Toronto Police Service personnel, including officers and administrative staff. Their compensation would be part of their standard salaries as law enforcement and administrative employees. No external crowdworkers or contractors were involved in the collection process.
 5.  *Over what timeframe was the data collected? Does this timeframe match the creation timeframe of the data associated with the instances (for example, recent crawl of old news articles)? If not, please describe the timeframe in which the data associated with the instances was created.*
@@ -90,7 +90,7 @@ All the following questions are extracted from @gebru2021datasheets.
 11. *Has an analysis of the potential impact of the dataset and its use on data subjects (for example, a data protection impact analysis) been conducted? If so, please provide a description of this analysis, including the outcomes, as well as a link or other access point to any supporting documentation.*
     -   There is no explicit mention of a formal data protection impact analysis (DPIA) or similar review for this dataset. However, the Toronto Police Service has implemented privacy measures, such as anonymizing data and offsetting locations, to minimize risks to individuals. The dataset’s availability through Open Data Toronto implies adherence to public transparency and data protection policies, though the lack of a detailed impact assessment leaves room for further ethical analysis.
 12. *Any other comments?*
-    -   While the dataset provides valuable insights for public safety and urban planning, a more detailed impact analysis could address potential unintended consequences, such as misrepresentation of neighborhoods or misuse of sensitive information. Documentation of such an analysis would enhance confidence in the dataset’s ethical use.
+    -   While the dataset provides important ideas for public safety and urban planning, a more detailed impact analysis could address potential unintended consequences, such as misrepresentation of neighborhoods or misuse of sensitive information. Documentation of such an analysis would enhance confidence in the dataset’s ethical use.
     
 # Preprocessing/cleaning/labeling
 
@@ -117,7 +117,7 @@ All the following questions are extracted from @gebru2021datasheets.
 5.  *Are there tasks for which the dataset should not be used? If so, please provide a description.*
     -   The dataset should not be used for tasks that could harm individuals or communities, such as creating unfair stereotypes about specific neighborhoods or using the data for discriminatory purposes. It is also unsuitable for highly granular analyses requiring exact locations due to privacy adjustments.
 6.  *Any other comments?*
-    -   This dataset is a valuable resource for research and policy but requires careful handling to respect privacy and avoid misuse. Clear documentation of limitations and preprocessing steps would further support ethical and effective use.
+    -   This dataset is a important resource for research and policy but requires careful handling to respect privacy and avoid misuse. Clear documentation of limitations and preprocessing steps would further support ethical and effective use.
 
 # Distribution
 
@@ -134,7 +134,7 @@ All the following questions are extracted from @gebru2021datasheets.
 6.  *Do any export controls or other regulatory restrictions apply to the dataset or to individual instances? If so, please describe these restrictions, and provide a link or other access point to, or otherwise reproduce, any supporting documentation.*
     -   No export controls or regulatory restrictions apply to the dataset. It is openly available for access and use by anyone, provided they adhere to the terms of the Open Government License.
 7.  *Any other comments?*
-    -   The dataset’s open distribution model ensures broad accessibility, promoting transparency and enabling its use in research, policy-making, and public initiatives. However, users should remain mindful of privacy and ethical considerations when analyzing and sharing insights derived from the dataset. Providing regular updates and improving metadata (e.g., DOI assignment) could enhance its usability and traceability.
+    -   The dataset’s open distribution model ensures broad accessibility, promoting transparency and enabling its use in research, policy-making, and public initiatives. However, users should remain mindful of privacy and ethical considerations when analyzing and sharing ideas derived from the dataset. Providing regular updates and improving metadata (e.g., DOI assignment) could enhance its usability and traceability.
 
 #Maintenance
 
