@@ -1,10 +1,9 @@
-# Install necessary packages
-if (!require("shiny")) install.packages("shiny")
-if (!require("leaflet")) install.packages("leaflet")
-if (!require("geojsonsf")) install.packages("geojsonsf")
-if (!require("dplyr")) install.packages("dplyr")
-if (!require("sf")) install.packages("sf")
-if (!require("here")) install.packages("here")
+# Purpose: Creates shiny app as a companion to the paper
+# Author: Yingke He
+# Date: 14 Dec 2024
+# Contact: kiki.he@mail.utoronto.ca
+# License: MIT
+# Pre-requisites: Have downloaded all the required libraries including shiny, leaflet and geojsonsf.
 
 library(shiny)
 library(leaflet)
