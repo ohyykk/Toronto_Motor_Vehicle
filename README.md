@@ -1,6 +1,6 @@
-## When Risk Hits the Road: Does Danger Drive a Return?
+## Motor Vehicle Risks in Toronto: Uncovering Collision and Theft Patterns
 ## Overview
-This repository contains the analysis for the [paper](https://github.com/ohyykk/Toronto_Motor_Viehicle/blob/main/paper/paper.pdf) **"When Risk Hits the Road: Does Danger Drive a Return?"** The study evaluates motorbike theft and collision risks in Toronto using a composite risk score model. Data from [OpenDataToronto](https://open.toronto.ca/dataset/motor-vehicle-collisions-involving-killed-or-seriously-injured-persons/) informs logistic regression and theft index calculations, highlighting key factors such as temporal patterns, environmental conditions, and neighborhood characteristics. The findings offer practical guidance for enhancing motorbike safety and urban mobility.
+This repository contains the analysis for the [paper](https://github.com/ohyykk/Toronto_Motor_Viehicle/blob/main/paper/paper.pdf) **"Motor Vehicle Risks in Toronto: Uncovering Collision and Theft Patterns"**. The study evaluates motorbike theft and collision risks in Toronto using a composite risk score model. Data from [OpenDataToronto](https://open.toronto.ca/dataset/motor-vehicle-collisions-involving-killed-or-seriously-injured-persons/) informs logistic regression and theft index calculations, highlighting key factors such as temporal patterns, environmental conditions, and neighborhood characteristics. The findings offer practical guidance for enhancing motorbike safety and urban mobility.
 ## Shiny app
 
 An application featuring the Motorbike Risk Index by neighborhood can be found [here](https://ohyykk.shinyapps.io/TorontoMotorVehicle/)
