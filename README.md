@@ -16,8 +16,9 @@ The repository is organized as follows:
   - Bibliography and citation files
 - `scripts`: Includes the R code for data simulating, cleaning, analysis, and visualization
 - `other/datasheet`: Contains the detailed datasheet for the collision and theft dataset
-- `other/llm`: record of various conversations with ChatGPT that contributed to the development of this motor risk project
-- `other/sketches`: previews of the charts and models included in the final research paper
+- `other/llm`: Contains record of various conversations with ChatGPT that contributed to the development of this motor risk project
+- `other/sketches`: Rreviews of the charts and models included in the final research paper
+- `other/shiny`: Include files used for the [shiny app](https://ohyykk.shinyapps.io/TorontoMotorVehicle/)
 
 ## Tools and Methodology
 
@@ -33,4 +34,4 @@ Software tools used include:
 
 ## Statement on LLM Usage
 
-The complete interaction history is documented in `other/llm_usage.txt` for transparency. 
+ChatGPT 4o is utilized to support data cleaning, plot generation, and grammar checks. The complete interaction history is documented in `other/llm_usage.txt` for transparency. 
