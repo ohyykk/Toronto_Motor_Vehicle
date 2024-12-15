@@ -1762,7 +1762,7 @@ Qualitative research with residents and stakeholders in high-risk neighborhoods 
 
 # Shiny Application {#sec-shiny}
 
-The Risk Index by neighborhood can be visualized [here](https://ohyykk.shinyapps.io/TorontoMotorVehicle/)
+The Risk Index by neighborhood can be visualized [here](https://ohyykk.shinyapps.io/TorontoMotorVehicle/).
 
 # Additional Data Details {#sec-data_details}
 
