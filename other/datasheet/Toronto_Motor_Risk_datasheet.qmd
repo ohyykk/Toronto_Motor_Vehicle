@@ -1,11 +1,10 @@
 ---
 title: "Datasheet for 'Toronto Motorbike Collision and Theft Risk'"
-subtitle: "Supplementary document to \"When Risk Hits the Road: Does Danger Drive a Return?\""
+subtitle: "Supplementary document to \"Motor Vehicle Risks in Toronto: Uncovering Collision and Theft Patterns\""
 author: 
   - Yingke He
 thanks: "Code and data are available at: [https://github.com/ohyykk/Toronto_Motor_Viehicle/tree/main](https://github.com/ohyykk/Toronto_Motor_Viehicle/tree/main)."
-date: Today
-date-format: "D MMMM YYYY"
+date: today 
 abstract: "This supplementary datasheet accompanies the motorbike risk analysis paper. Adopting the standardized format proposed by Gebru et al. (2021), it documents the motivation, composition, collection process, recommended applications, maintenance, and distribution of the cleaned dataset, available in the analysis data folder of the [GitHub Repository](https://github.com/ohyykk/Toronto_Motor_Viehicle/tree/main). The goal is to enhance communication between dataset creators and users while promoting transparency and accountability within the statistical and risk analysis communities."
 format: pdf
 toc: true
